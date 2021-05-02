@@ -1,45 +1,49 @@
 import './App.css';
 import WebMidi, { InputEventNoteon } from 'webmidi';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import * as StaffService from './Staff';
+
 
 function App() {
-  // const [isMidiEnabled, setIsMidiEnabled] = useState(false);
-  // const [input, setInput] = useState();
-  const [note, setNote] = useState<string>();
-  useEffect(() => {
-    WebMidi.enable(function (err) {
+  const [note, setNote] = useState<string>("");
 
+  useEffect(() => {
+    StaffService.Staff();
+    WebMidi.enable(function (err) {
       if (err) {
         console.log("WebMidi could not be enabled.", err);
       } else {
-        // setIsMidiEnabled(true);
         var midiInput = WebMidi.getInputByName("Roland Digital Piano");
-        if(midiInput){
-          
+        if (midiInput) {
           midiInput.addListener('noteon', "all", function (e: InputEventNoteon) {
-            var noteValue: string = e.note.name + e.note.octave; 
+            var noteValue: string = e.note.name + e.note.octave;
             console.log(`Received: "${noteValue}"`)
             setNote(noteValue);
           });
         }
         console.log("WebMidi enabled!", WebMidi.inputs);
-        // setInput(midiInput);
       }
-
     });
   }, [])
 
+  useEffect(() => {
+    StaffService.updateStaff(note);
+    setNote(""); //Clear state to register for next note if correct
+  }, [note])
 
 
   return (
     <>
       <div className="App">
-        {note}
+        <div id='staff' />
+        <button onClick={() => setNote("A2")}> Send A2</button>
+        <button onClick={() => setNote("C3")}> Send C3</button>
+        <button onClick={() => setNote("E3")}> Send E3</button>
+        <button onClick={() => setNote("G3")}> Send G3</button>
+
       </div>
     </>
   );
 }
-
-
 
 export default App;
