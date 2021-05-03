@@ -28,7 +28,7 @@ export const updateStaff = (note: string) => {
     var green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
     var black = { fillStyle: "#000000", strokeStyle: "#000000" };
 
-    if (note !== "" && currentNoteIndex < numNotes) {
+    if (note !== "") {
         if(note === "C8") {
             window.location.reload(true);
             return;
