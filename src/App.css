@@ -1,11 +1,3 @@
 .App {
   text-align: center;
 }
-
-.vf-note-green {
-  filter: invert(54%) sepia(66%) saturate(4387%) hue-rotate(89deg) brightness(105%) contrast(117%);
-}
-
-.vf-note-red { 
-  filter: invert(10%) sepia(96%) saturate(7319%) hue-rotate(14deg) brightness(83%) contrast(117%);
-}

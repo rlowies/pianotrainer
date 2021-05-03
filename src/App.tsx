@@ -1,14 +1,14 @@
 import './App.css';
 import WebMidi, { InputEventNoteon } from 'webmidi';
-import React, { useEffect, useState } from 'react';
-import * as StaffService from './Staff';
+import { useEffect, useState } from 'react';
+import * as StaffService from './services/Staff.service';
 
 
 function App() {
   const [note, setNote] = useState<string>("");
 
   useEffect(() => {
-    StaffService.Staff();
+    StaffService.Initialize();
     WebMidi.enable(function (err) {
       if (err) {
         console.log("WebMidi could not be enabled.", err);
