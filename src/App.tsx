@@ -40,6 +40,12 @@ function App() {
         <button onClick={() => setNote("C3")}> Send C3</button>
         <button onClick={() => setNote("E3")}> Send E3</button>
         <button onClick={() => setNote("G3")}> Send G3</button>
+        <button onClick={() => {
+          setNote("C8")
+        }
+        }> Reset</button>
+
+
 
       </div>
     </>

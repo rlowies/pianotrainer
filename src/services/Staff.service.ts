@@ -1,12 +1,12 @@
 import Vex from 'vexflow';
-import * as NoteService from './Note.service'
-import { INote } from './Note.service';
+import { INote, generateNotes, bassClefEasy } from './Note.service';
 
 const VF = Vex.Flow;
 var staff: Vex.Flow.Stave;
 var currentNoteIndex = 0;
 var notes: Vex.Flow.StaveNote[];
 var noteConfig: INote[];
+var numNotes = 4;
 
 export const Initialize = () => {
     var div = document.getElementById("staff")!;
@@ -17,7 +17,7 @@ export const Initialize = () => {
     stave.addClef("bass").addTimeSignature("4/4");
     stave.setContext(context).draw();
     staff = stave;
-    noteConfig = NoteService.generateNotes(NoteService.bassClefEasy, true, 4);
+    noteConfig = generateNotes(bassClefEasy, true, numNotes);
     notes = noteConfig.map(x => x.note);
     updateStaff("");
 }
@@ -28,7 +28,12 @@ export const updateStaff = (note: string) => {
     var green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
     var black = { fillStyle: "#000000", strokeStyle: "#000000" };
 
-    if (note !== "") {
+    if (note !== "" && currentNoteIndex < numNotes) {
+        if(note === "C8") {
+            window.location.reload(true);
+            return;
+        }
+
         var currentNoteToPlay:INote = noteConfig[currentNoteIndex];
 
         if (currentNoteIndex == currentNoteToPlay.order) {
@@ -39,7 +44,7 @@ export const updateStaff = (note: string) => {
                 notes[currentNoteIndex].setStyle(red);
             }
         }
-    }
+    } 
 
     var voice = new VF.Voice({ num_beats: 4, beat_value: 4 });
     voice.addTickables(notes);
