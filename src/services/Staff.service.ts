@@ -17,7 +17,7 @@ export const Initialize = () => {
     stave.addClef("bass").addTimeSignature("4/4");
     stave.setContext(context).draw();
     staff = stave;
-    noteConfig = NoteService.generateNotes('a/2,c/3,e/3,g/3', true);
+    noteConfig = NoteService.generateNotes(NoteService.bassClefEasy, true, 4);
     notes = noteConfig.map(x => x.note);
     updateStaff("");
 }
