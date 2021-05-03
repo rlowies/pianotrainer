@@ -2,7 +2,7 @@ import './App.css';
 import WebMidi, { InputEventNoteon } from 'webmidi';
 import { useEffect, useState } from 'react';
 import * as StaffService from './services/Staff.service';
-import { bassClefEasy, generateNotes, INote, playableNotes, randomSort } from './services/Note.service';
+import { bassClefEasy, generateNotes, playableNotes, randomSort } from './services/Note.service';
 
 
 function App() {
@@ -39,7 +39,7 @@ function App() {
     <>
       <div className="App">
         <div id='staff' />
-        {playableNotes.map(x => <button onClick={() => setNote(x)}> Send {x}</button>).sort(randomSort)}
+        {playableNotes.map((x,i) => <button key={i} onClick={() => setNote(x)}> Send {x}</button>).sort(randomSort)}
         <button onClick={() => { setNote("C8") }}> Reset</button>
       </div>
     </>
