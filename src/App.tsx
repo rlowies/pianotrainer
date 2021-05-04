@@ -1,16 +1,13 @@
 import './App.css';
 import WebMidi, { InputEventNoteon } from 'webmidi';
 import { useEffect, useState } from 'react';
-import * as StaffService from './services/Staff.service';
-import { bassClefEasy, generateNotes, playableNotes, randomSort } from './services/Note.service';
-
+import { bassClefEasy, generateNotes } from './services/Note.service';
+import Staff from './Staff';
 
 function App() {
   const [note, setNote] = useState<string>("");
 
   useEffect(() => {
-    StaffService.Initialize(generateNotes(bassClefEasy, true, 4));
-
     WebMidi.enable(function (err) {
       if (err) {
         console.log("WebMidi could not be enabled.", err);
@@ -25,22 +22,13 @@ function App() {
         }
         console.log("WebMidi enabled!", WebMidi.inputs);
       }
-    setNote("init"); 
     });
   }, [])
-
-  useEffect(() => {
-    StaffService.updateStaff(note);
-    setNote(""); //Clear state to register for next note if correct
-  }, [note])
-
 
   return (
     <>
       <div className="App">
-        <div id='staff' />
-        {playableNotes.map((x,i) => <button key={i} onClick={() => setNote(x)}> Send {x}</button>).sort(randomSort)}
-        <button onClick={() => { setNote("C8") }}> Reset</button>
+        <Staff note={note} playableNotes={generateNotes(bassClefEasy, true, 4)}/>
       </div>
     </>
   );
