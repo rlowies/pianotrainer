@@ -8,7 +8,7 @@ var notes: Vex.Flow.StaveNote[];
 var noteConfig: INote[];
 var numNotes = 4;
 
-export const Initialize = () => {
+export const Initialize = (playableNotes: INote[]) => {
     var div = document.getElementById("staff")!;
     var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
     renderer.resize(500, 500);
@@ -17,7 +17,7 @@ export const Initialize = () => {
     stave.addClef("bass").addTimeSignature("4/4");
     stave.setContext(context).draw();
     staff = stave;
-    noteConfig = generateNotes(bassClefEasy, true, numNotes);
+    noteConfig = playableNotes;
     notes = noteConfig.map(x => x.note);
     updateStaff("");
 }
@@ -31,6 +31,12 @@ export const updateStaff = (note: string) => {
     if (note !== "") {
         if(note === "C8") {
             window.location.reload(true);
+            return;
+        }
+
+        //Dirty hack for now
+        if(note == "init") {
+            notes[0].setStyle(black);
             return;
         }
 
