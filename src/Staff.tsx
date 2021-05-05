@@ -34,12 +34,12 @@ export default function Staff(props: any) {
 
             if (note !== "") {
                 if (note === "C8") {
-                    // window.location.reload(true);
                     var newNotes = generateNotes(bassClefEasy, true, 4);
+                    staff.getContext().clear();
+                    staff.setContext(staff.getContext()).draw();
+
                     setPlayableNotes(newNotes);
                     setNotes(newNotes.map(x => x.note));
-                    // setInit(false);
-                    // Initialize();
                     return;
                 }
 
