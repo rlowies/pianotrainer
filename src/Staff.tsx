@@ -6,7 +6,6 @@ interface StaffConfig {
     VF: typeof Vex.Flow;
     staff: Vex.Flow.Stave;
     currentNoteIndex: number;
-    noteConfig: INote;
     numNotes: number;
 }
 
@@ -14,7 +13,6 @@ const initialStaffConfig: StaffConfig = {
     VF: Vex.Flow,
     staff: new Vex.Flow.Stave(10, 40, 400),
     currentNoteIndex: 0,
-    noteConfig: {} as INote,
     numNotes: 4,
 }
 
