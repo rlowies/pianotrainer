@@ -6,7 +6,6 @@ interface StaffConfig {
     VF: typeof Vex.Flow;
     staff: Vex.Flow.Stave;
     currentNoteIndex: number;
-    noteConfig: INote;
     numNotes: number;
 }
 
@@ -14,7 +13,6 @@ const initialStaffConfig: StaffConfig = {
     VF: Vex.Flow,
     staff: new Vex.Flow.Stave(10, 40, 400),
     currentNoteIndex: 0,
-    noteConfig: {} as INote,
     numNotes: 4,
 }
 
@@ -33,6 +31,9 @@ export default function Staff(props: any) {
             var green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
 
             if (note !== "") {
+                let staffConfigUpdate: StaffConfig = {
+                    ...staffConfig
+                }
                 if (note === "C8") {
                     var newNotes = generateNotes(bassClefEasy, true, 4);
                     staff.getContext().clear();
@@ -40,11 +41,9 @@ export default function Staff(props: any) {
 
                     setPlayableNotes(newNotes);
                     setNotes(newNotes.map(x => x.note));
+                    staffConfigUpdate.currentNoteIndex = 0;
+                    setStaffConfig(staffConfigUpdate)
                     return;
-                }
-
-                let staffConfigUpdate: StaffConfig = {
-                    ...staffConfig
                 }
 
                 var currentNoteToPlay: INote = playableNotes[currentNoteIndex];
