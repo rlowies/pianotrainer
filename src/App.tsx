@@ -1,7 +1,6 @@
 import './App.css';
 import WebMidi, { InputEventNoteon } from 'webmidi';
 import { useEffect, useState } from 'react';
-import { bassClefEasy, generateNotes } from './services/Note.service';
 import Staff from './Staff';
 
 function App() {
@@ -28,7 +27,7 @@ function App() {
   return (
     <>
       <div className="App">
-        <Staff note={note} playableNotes={generateNotes(bassClefEasy, true, 4)}/>
+        <Staff note={note} />
       </div>
     </>
   );
