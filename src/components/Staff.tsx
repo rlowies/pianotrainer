@@ -19,6 +19,7 @@ const initialStaffConfig: StaffConfig = {
 export default function Staff() {
     const [note, setNote] = useState<string>("");
     const [init, setInit] = useState<boolean>(false);
+    const [hideButtons, setHideButtons] = useState<boolean>(false);
     const [staffConfig, setStaffConfig] = useState<StaffConfig>(initialStaffConfig);
     const [clefType, setClefType] = useState<string>("bass");
 
@@ -97,13 +98,14 @@ export default function Staff() {
     return (
         <>
             <div id='staff' />
-            {staffConfig.playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(randomSort)}
+            {hideButtons && staffConfig.playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(randomSort)}
             <hr/>
             <button onClick={() => { setNote("C8") }}> Reset</button>
             <button onClick={() => {
                 clefType === "bass" ? setClefType("treble") : setClefType("bass");
                 setNote("C8");
             }}> Change Clef</button>
+            <button onClick={() => { setHideButtons(!hideButtons); }}> Piano Mode</button>
         </>
     );
 
