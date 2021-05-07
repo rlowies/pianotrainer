@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Vex from 'vexflow';
 import { bassClefEasy, bassClefMedium, generateNotes, INote, randomSort, trebleClefMedium } from './services/Note.service';
+import WebMidi, { InputEventNoteon } from 'webmidi';
 
 interface StaffConfig {
     VF: typeof Vex.Flow;
@@ -16,7 +17,7 @@ const initialStaffConfig: StaffConfig = {
     numNotes: 4,
 }
 
-export default function Staff(props: any) {
+export default function Staff() {
     const [note, setNote] = useState<string>("");
     const [init, setInit] = useState<boolean>(false);
     const [staffConfig, setStaffConfig] = useState<StaffConfig>(initialStaffConfig);
@@ -84,15 +85,32 @@ export default function Staff(props: any) {
             staff.addClef(clefType).addTimeSignature("4/4");
             staff.setContext(context).draw();
             updateStaff();
+
+            WebMidi.enable(function (err) {
+                if (err) {
+                  console.log("WebMidi could not be enabled.", err);
+                } else {
+                  var midiInput = WebMidi.getInputByName("Roland Digital Piano");
+                  if (midiInput) {
+                    midiInput.addListener('noteon', "all", function (e: InputEventNoteon) {
+                      var noteValue: string = e.note.name + e.note.octave;
+                      console.log(`Received: "${noteValue}"`)
+                      setNote(noteValue);
+                    });
+                  }
+                  console.log("WebMidi enabled!", WebMidi.inputs);
+                }
+              });
+
             setInit(true);
         }
 
         if (!init) {
             Initialize();
         }
-        setNote(props.note);
+        setNote("");
         updateStaff();
-    }, [props.note, playableNotes, note, init, staffConfig, clefType, notes])
+    }, [playableNotes, note, init, staffConfig, clefType, notes])
 
     return (
         <>
