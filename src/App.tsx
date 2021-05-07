@@ -23,17 +23,16 @@ function App() {
             </li>
           </ul>
         </nav>
-
-        {/* A <Switch> looks through its children <Route>s and
-            renders the first one that matches the current URL. */}
-        <Switch>
-          <Route path="/staff">
-            <Staff reset={true}/>
+        <div className="App">
+          <Switch>
+            <Route path="/staff">
+              <Staff reset={true} />
+            </Route>
+            <Route path="/">
+              Home
           </Route>
-          <Route path="/">
-            Home
-          </Route>
-        </Switch>
+          </Switch>
+        </div>
       </div>
     </Router>
   );
