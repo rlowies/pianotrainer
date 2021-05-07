@@ -4,6 +4,7 @@ import Vex from 'vexflow';
 import { bassClefEasy, bassClefMedium, generateNotes, INote, randomSort, trebleClefMedium } from '../services/Note.service';
 import * as StaffService from '../services/Staff.service';
 import { StaffConfig } from '../services/Staff.service';
+import { useLocation } from 'react-router';
 
 const VF = Vex.Flow;
 const initialNotes: INote[] = generateNotes(bassClefEasy, false, 4, "bass");
@@ -16,7 +17,7 @@ const initialStaffConfig: StaffConfig = {
     notes: initialNotes.map(x => x.note),
 }
 
-export default function Staff() {
+export default function Staff(props:any) {
     const [note, setNote] = useState<string>("");
     const [init, setInit] = useState<boolean>(false);
     const [hideButtons, setHideButtons] = useState<boolean>(false);
@@ -95,17 +96,21 @@ export default function Staff() {
         updateStaff();
     }, [note, init, staffConfig, clefType])
 
+    useEffect(() => {
+        setNote("C8");
+    }, [props.reset])
+
     return (
         <>
             <div id='staff' />
-            {hideButtons && staffConfig.playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(randomSort)}
+            {!hideButtons && staffConfig.playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(randomSort)}
             <hr/>
             <button onClick={() => { setNote("C8") }}> Reset</button>
             <button onClick={() => {
                 clefType === "bass" ? setClefType("treble") : setClefType("bass");
                 setNote("C8");
             }}> Change Clef</button>
-            <button onClick={() => { setHideButtons(!hideButtons); }}> Piano Mode</button>
+            <button onClick={() => { setHideButtons(!hideButtons); }}> {`${!hideButtons ? "Piano" : "Manual"} Mode`}</button>
         </>
     );
 
