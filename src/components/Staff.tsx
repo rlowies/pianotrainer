@@ -97,8 +97,9 @@ export default function Staff(props:any) {
     }, [note, init, staffConfig, clefType])
 
     useEffect(() => {
+        setClefType(props.clef);
         setNote("C8");
-    }, [props.reset])
+    }, [props.reset, props.clef])
 
     return (
         <>

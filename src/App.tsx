@@ -19,14 +19,20 @@ function App() {
               <Link to="/">Home</Link>
             </li>
             <li>
-              <Link to="/staff">Staff</Link>
+              <Link to="/treble">Treble</Link>
+            </li>
+            <li>
+              <Link to="/bass">Bass</Link>
             </li>
           </ul>
         </nav>
         <div className="App">
           <Switch>
-            <Route path="/staff">
-              <Staff reset={true} />
+            <Route path="/treble">
+              <Staff reset={true} clef={"treble"} />
+            </Route>
+            <Route path="/bass">
+              <Staff reset={true} clef={"bass"} />
             </Route>
             <Route path="/">
               Home
