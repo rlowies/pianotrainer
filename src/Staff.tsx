@@ -1,44 +1,33 @@
 import { useEffect, useState } from 'react';
+import WebMidi, { InputEventNoteon } from 'webmidi';
 import Vex from 'vexflow';
 import { bassClefEasy, bassClefMedium, generateNotes, INote, randomSort, trebleClefMedium } from './services/Note.service';
+import * as StaffService from './services/Staff.service';
+import { StaffConfig } from './services/Staff.service';
 
-interface StaffConfig {
-    VF: typeof Vex.Flow;
-    staff: Vex.Flow.Stave;
-    currentNoteIndex: number;
-    numNotes: number;
-}
+const VF = Vex.Flow;
+const initialNotes: INote[] = generateNotes(bassClefEasy, false, 4, "bass");
 
 const initialStaffConfig: StaffConfig = {
-    VF: Vex.Flow,
     staff: new Vex.Flow.Stave(10, 40, 400),
     currentNoteIndex: 0,
     numNotes: 4,
+    playableNotes: initialNotes,
+    notes: initialNotes.map(x => x.note),
 }
 
-export default function Staff(props: any) {
+export default function Staff() {
     const [note, setNote] = useState<string>("");
     const [init, setInit] = useState<boolean>(false);
     const [staffConfig, setStaffConfig] = useState<StaffConfig>(initialStaffConfig);
     const [clefType, setStaffType] = useState<string>("bass");
-    const [playableNotes, setPlayableNotes] = useState<INote[]>(generateNotes(bassClefEasy, true, 4, clefType));
-    const [notes, setNotes] = useState<Vex.Flow.StaveNote[]>(playableNotes.map(x => x.note));
 
     useEffect(() => {
-        var { VF, staff, currentNoteIndex, numNotes } = staffConfig;
-
-        const initVoice = () => {
-            var voice = new VF.Voice({ num_beats: 4, beat_value: 4 });
-            voice.addTickables(notes);
-            // Format and justify the notes to 400 pixels.
-            new VF.Formatter().joinVoices([voice]).format([voice], 400);
-            voice.draw(staff.getContext(), staff);
-        }
+        var { staff, notes } = staffConfig;
 
         const resetStaff = (type: string, config: StaffConfig) => {
-            var newNotes = generateNotes(type === "bass" ? bassClefMedium : trebleClefMedium, true, 4, clefType);
-            setPlayableNotes(newNotes);
-            setNotes(newNotes.map(x => x.note));
+            config.playableNotes = generateNotes(type === "bass" ? bassClefMedium : trebleClefMedium, true, 4, clefType);
+            config.notes = config.playableNotes.map(x => x.note);
             config.staff = new Vex.Flow.Stave(10, 40, 400);
             staff.getContext().clear();
             config.staff.addClef(type).addTimeSignature("4/4");
@@ -48,32 +37,24 @@ export default function Staff(props: any) {
         }
 
         const updateStaff = () => {
-            var red = { fillStyle: "#cc0000", strokeStyle: "#cc0000" };
-            var green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
-
             if (note !== "") {
                 let staffConfigUpdate: StaffConfig = {
                     ...staffConfig
                 }
+
                 if (note === "C8") {
                     resetStaff(clefType, staffConfigUpdate)
                     return;
                 }
 
-                var currentNoteToPlay: INote = playableNotes[currentNoteIndex];
-
-                if (currentNoteIndex < numNotes && currentNoteIndex === currentNoteToPlay.order) {
-                    if (note === currentNoteToPlay.name) {
-                        notes[currentNoteIndex].setStyle(green);
-                        staffConfigUpdate.currentNoteIndex++;
-                    } else {
-                        notes[currentNoteIndex].setStyle(red);
-                    }
+                var isCorrect = StaffService.updateNotes(staffConfig, note);
+                if (isCorrect) {
+                    staffConfigUpdate.currentNoteIndex++;
+                    setStaffConfig(staffConfigUpdate)
                 }
-                setStaffConfig(staffConfigUpdate)
             }
 
-            initVoice();
+            StaffService.initVoice(notes, staff);
         }
 
         const Initialize = () => {
@@ -83,21 +64,38 @@ export default function Staff(props: any) {
             var context = renderer.getContext();
             staff.addClef(clefType).addTimeSignature("4/4");
             staff.setContext(context).draw();
-            updateStaff();
+
+            WebMidi.enable(function (err) {
+                if (err) {
+                    console.log("WebMidi could not be enabled.", err);
+                } else {
+                    var midiInput = WebMidi.getInputByName("Roland Digital Piano");
+                    if (midiInput) {
+                        midiInput.addListener('noteon', "all", function (e: InputEventNoteon) {
+                            var noteValue = e.note.name + e.note.octave;
+                            setNote(noteValue);
+                            console.log(`Received: "${noteValue}"`)
+                        });
+                    }
+                    console.log("WebMidi enabled!", WebMidi.inputs);
+                }
+            });
+
             setInit(true);
         }
 
         if (!init) {
             Initialize();
         }
-        setNote(props.note);
+
+        setNote("");
         updateStaff();
-    }, [props.note, playableNotes, note, init, staffConfig, clefType, notes])
+    }, [note, init, staffConfig, clefType])
 
     return (
         <>
             <div id='staff' />
-            {playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(randomSort)}
+            {staffConfig.playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(randomSort)}
             <button onClick={() => { setNote("C8") }}> Reset</button>
             <button onClick={() => {
                 if (clefType === "bass") {
