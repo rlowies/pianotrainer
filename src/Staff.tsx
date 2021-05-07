@@ -53,8 +53,6 @@ export default function Staff() {
                     setStaffConfig(staffConfigUpdate)
                 }
             }
-
-            StaffService.initVoice(notes, staff);
         }
 
         const Initialize = () => {
@@ -86,6 +84,10 @@ export default function Staff() {
 
         if (!init) {
             Initialize();
+        }
+
+        if(note === "") {
+            StaffService.initVoice(notes, staff);
         }
 
         setNote("");
