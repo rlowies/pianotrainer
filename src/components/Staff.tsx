@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import WebMidi, { InputEventNoteon } from 'webmidi';
 import Vex from 'vexflow';
-import { bassClefEasy, bassClefMedium, generateNotes, INote, randomSort, trebleClefMedium } from './services/Note.service';
-import * as StaffService from './services/Staff.service';
-import { StaffConfig } from './services/Staff.service';
+import { bassClefEasy, bassClefMedium, generateNotes, INote, randomSort, trebleClefMedium } from '../services/Note.service';
+import * as StaffService from '../services/Staff.service';
+import { StaffConfig } from '../services/Staff.service';
 
 const VF = Vex.Flow;
 const initialNotes: INote[] = generateNotes(bassClefEasy, false, 4, "bass");
@@ -20,7 +20,7 @@ export default function Staff() {
     const [note, setNote] = useState<string>("");
     const [init, setInit] = useState<boolean>(false);
     const [staffConfig, setStaffConfig] = useState<StaffConfig>(initialStaffConfig);
-    const [clefType, setStaffType] = useState<string>("bass");
+    const [clefType, setClefType] = useState<string>("bass");
 
     useEffect(() => {
         var { staff, notes } = staffConfig;
@@ -86,7 +86,7 @@ export default function Staff() {
             Initialize();
         }
 
-        if(note === "") {
+        if (note === "") {
             StaffService.initVoice(notes, staff);
         }
 
@@ -98,17 +98,12 @@ export default function Staff() {
         <>
             <div id='staff' />
             {staffConfig.playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(randomSort)}
+            <hr/>
             <button onClick={() => { setNote("C8") }}> Reset</button>
             <button onClick={() => {
-                if (clefType === "bass") {
-                    setStaffType("treble");
-                }
-                else {
-                    setStaffType("bass");
-                }
+                clefType === "bass" ? setClefType("treble") : setClefType("bass");
                 setNote("C8");
-            }
-            }> Change Staff</button>
+            }}> Change Clef</button>
         </>
     );
 
