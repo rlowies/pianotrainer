@@ -19,6 +19,8 @@ const initialStaffConfig: StaffConfig = {
     notes: initialNotes.map(x => x.note),
 }
 
+const canEnableMidi = navigator.userAgent.indexOf("Chrome") !== -1;
+
 export default function Staff(props: any) {
     const [note, setNote] = useState<string>("");
     const [init, setInit] = useState<boolean>(false);
@@ -68,21 +70,23 @@ export default function Staff(props: any) {
             staff.addClef(clefType).addTimeSignature("4/4");
             staff.setContext(context).draw();
 
-            WebMidi.enable(function (err) {
-                if (err) {
-                    console.log("WebMidi could not be enabled.", err);
-                } else {
-                    var midiInput = WebMidi.getInputByName("Roland Digital Piano");
-                    if (midiInput) {
-                        midiInput.addListener('noteon', "all", function (e: InputEventNoteon) {
-                            var noteValue = e.note.name + e.note.octave;
-                            setNote(noteValue);
-                            console.log(`Received: "${noteValue}"`)
-                        });
+            if(canEnableMidi) {
+                WebMidi.enable(function (err) {
+                    if (err) {
+                        console.log("WebMidi could not be enabled.", err);
+                    } else {
+                        var midiInput = WebMidi.getInputByName("Roland Digital Piano");
+                        if (midiInput) {
+                            midiInput.addListener('noteon', "all", function (e: InputEventNoteon) {
+                                var noteValue = e.note.name + e.note.octave;
+                                setNote(noteValue);
+                                console.log(`Received: "${noteValue}"`)
+                            });
+                        }
+                        console.log("WebMidi enabled!", WebMidi.inputs);
                     }
-                    console.log("WebMidi enabled!", WebMidi.inputs);
-                }
-            });
+                });
+            }
 
             setInit(true);
         }
@@ -102,8 +106,10 @@ export default function Staff(props: any) {
     useEffect(() => {
         setClefType(props.clef);
         setNote("C8");
-        return () => {
-            WebMidi.disable()
+        if(canEnableMidi) {
+            return () => {
+                WebMidi.disable()
+            }
         }
     }, [props])
 
