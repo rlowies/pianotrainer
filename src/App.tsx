@@ -30,7 +30,7 @@ function App() {
 }
 
 function NoteTraining() {
-  let { path, url } = useRouteMatch();
+  let { url } = useRouteMatch();
 
   return (
     <Router>
