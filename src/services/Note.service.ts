@@ -18,8 +18,17 @@ export const generateNotes = (random: boolean = false, count: number, clef: stri
     for (var i = 0; i < count; i++) {
         var currentKey = allNotes[i];
 
+        var noteToAdd: Vex.Flow.StaveNote = new VF.StaveNote({ clef: clef, keys: [currentKey], duration: "q", auto_stem: true });
+        if(currentKey.codePointAt(1) === 35) {
+            noteToAdd.addAccidental(0, new VF.Accidental("#"));
+        }
+
+        if(currentKey.codePointAt(1) === 98) {
+            noteToAdd.addAccidental(0, new VF.Accidental("b"));
+        }
+
         res.push({
-            note: new VF.StaveNote({ clef: clef, keys: [currentKey], duration: "q", auto_stem: true }),
+            note: noteToAdd,
             name: currentKey.replace("/", "").toUpperCase(),
             order: i
         });
@@ -59,6 +68,9 @@ const trebleClefHard = "c/4,d/4,e/4,f/4,g/4,a/4,b/4,c/5,d/5,e/5,f/5,g/5,a/5,b/5,
 
 
 const bassClefMedium: string = "c/2,d/2,e/2,f/2,g/2,a/2,b/2,c/3,d/3,e/3,f/3,g/3,a/3,b/3,c/4";
+// const bassClefSharps = "c#/1,d#/1,f#/1,g#/1,a#/1,c#/2,d#/2,f#/2,g#/2,a#/2,c#/3,d#/3,f#/3,g#/3,a#/3";
+// const bassClefFlats = "db/1,eb/1,gb/1,ab/1,bb/1,db/2,eb/2,gb/2,ab/2,bb/2,db/3,eb/3,gb/3,ab/3,bb/3";
+// const bassClefAll = bassClefHard + "," + bassClefFlats + "," + bassClefSharps;
 
 // cdefgab2
 // cdefgab3

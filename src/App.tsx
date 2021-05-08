@@ -61,7 +61,7 @@ function Levels(props: any) {
       <Switch>
         <Route exact path={path}>
           <div className="training-buttons">
-          <h3>Please select a level.</h3>
+            <h3>Please select a level.</h3>
             <Link to={`${url}/easy`}>Easy</Link>
             <Link to={`${url}/medium`}>Medium</Link>
             <Link to={`${url}/hard`}>Hard</Link>

@@ -36,9 +36,10 @@ export default function Staff(props: any) {
             config.playableNotes = NoteService.generateNotes(true, 4, clefType, level);
             config.notes = config.playableNotes.map(x => x.note);
             config.staff = new Vex.Flow.Stave(10, 40, 400);
-            staff.getContext().clear();
+            var context = staff.getContext();
+            context.clear();
             config.staff.addClef(type).addTimeSignature("4/4");
-            config.staff.setContext(staff.getContext()).draw();
+            config.staff.setContext(context).draw();
             config.currentNoteIndex = 0;
             setStaffConfig(config)
         }
@@ -65,7 +66,7 @@ export default function Staff(props: any) {
         const Initialize = () => {
             var div = document.getElementById("staff")!;
             var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
-            renderer.resize(420, 500);
+            renderer.resize(420, 300);
             var context = renderer.getContext();
             staff.addClef(clefType).addTimeSignature("4/4");
             staff.setContext(context).draw();
