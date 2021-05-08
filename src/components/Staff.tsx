@@ -97,11 +97,14 @@ export default function Staff(props: any) {
 
         setNote("");
         updateStaff();
-    }, [note, init, staffConfig, clefType])
+    }, [note, init, staffConfig, clefType, level])
 
     useEffect(() => {
         setClefType(props.clef);
         setNote("C8");
+        return () => {
+            WebMidi.disable()
+        }
     }, [props])
 
     return (
