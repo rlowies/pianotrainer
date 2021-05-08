@@ -4,7 +4,8 @@ import Vex from 'vexflow';
 import { bassClefEasy, bassClefMedium, generateNotes, INote, randomSort, trebleClefMedium } from '../services/Note.service';
 import * as StaffService from '../services/Staff.service';
 import { StaffConfig } from '../services/Staff.service';
-import { useLocation } from 'react-router';
+import { useParams } from 'react-router-dom';
+import './Staff.css'
 
 const VF = Vex.Flow;
 const initialNotes: INote[] = generateNotes(bassClefEasy, false, 4, "bass");
@@ -17,12 +18,13 @@ const initialStaffConfig: StaffConfig = {
     notes: initialNotes.map(x => x.note),
 }
 
-export default function Staff(props:any) {
+export default function Staff(props: any) {
     const [note, setNote] = useState<string>("");
     const [init, setInit] = useState<boolean>(false);
     const [hideButtons, setHideButtons] = useState<boolean>(false);
     const [staffConfig, setStaffConfig] = useState<StaffConfig>(initialStaffConfig);
     const [clefType, setClefType] = useState<string>("bass");
+    let { level } = useParams<any>();
 
     useEffect(() => {
         var { staff, notes } = staffConfig;
@@ -60,7 +62,7 @@ export default function Staff(props:any) {
         const Initialize = () => {
             var div = document.getElementById("staff")!;
             var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
-            renderer.resize(500, 500);
+            renderer.resize(420, 500);
             var context = renderer.getContext();
             staff.addClef(clefType).addTimeSignature("4/4");
             staff.setContext(context).draw();
@@ -99,19 +101,24 @@ export default function Staff(props:any) {
     useEffect(() => {
         setClefType(props.clef);
         setNote("C8");
-    }, [props.reset, props.clef])
+    }, [props])
 
     return (
         <>
-            <div id='staff' />
-            {!hideButtons && staffConfig.playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(randomSort)}
-            <hr/>
-            <button onClick={() => { setNote("C8") }}> Reset</button>
-            <button onClick={() => {
-                clefType === "bass" ? setClefType("treble") : setClefType("bass");
-                setNote("C8");
-            }}> Change Clef</button>
-            <button onClick={() => { setHideButtons(!hideButtons); }}> {`${!hideButtons ? "Piano" : "Manual"} Mode`}</button>
+            <div className="all-staff">
+                <div id='staff' className="App" />
+                <div className="staff-buttons">
+                    {!hideButtons && staffConfig.playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(randomSort)}
+                    <hr />
+                    <button onClick={() => { setNote("C8") }}> Reset</button>
+                    <button onClick={() => {
+                        clefType === "bass" ? setClefType("treble") : setClefType("bass");
+                        setNote("C8");
+                    }}> Change Clef</button>
+                    <button onClick={() => { setHideButtons(!hideButtons); }}> {`${!hideButtons ? "Piano" : "Manual"} Mode`}</button>
+                </div>
+            </div>
+
         </>
     );
 
