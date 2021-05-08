@@ -6,12 +6,12 @@ export interface INote {
     order: number;
 }
 
-export const generateNotes = (notes: string, random: boolean = false, count: number, clef: string): INote[] => {
+export const generateNotes = (random: boolean = false, count: number, clef: string, level: string): INote[] => {
     var res: INote[] = [];
-    var allNotes = notes.split(",");
+    var allNotes = setupLevel(clef, level).split(",");
     const VF = Vex.Flow;
 
-    if(random) {
+    if (random) {
         allNotes = allNotes.sort(randomSort)
     }
 
@@ -29,18 +29,36 @@ export const generateNotes = (notes: string, random: boolean = false, count: num
 }
 
 export const randomSort = () => 0.5 - Math.random();
-const bassClefInSpaces:string = "a/2,b/1,b/3,c/1,c/3,d/2,e/1,e/3,g/1,g/3";
-const bassClefInLines:string = "a/1,a/3,c/2,c/4,b/2,d/1,d/3,e/2,f/1,g/2";
 
-export const bassCleffHard:string = bassClefInLines + "," + bassClefInSpaces;
-export const bassClefEasy:string = "a/2,c/3,e/3,g/3,g/2,b/2,d/3,f/3,a/3";
+const clefIsTreble = (clef: string) => {
+    return clef === "treble";
+}
 
-export const trebleClefInLines:string = "a/3,c/4,e/4,g/4,b/4,d/5,f/5,a/5,c/6";//2 above and below ledger 
-export const trebleClefInSpaces:string = "b/3,d/4,f/4,a/4,c/5,e/5,g/5,b/5";//2 above and below ledger 
-export const trebleClefEasy = "e/4,g/4,b/4,d/5,f/5,f/4,a/4,c/5,e/5";
-export const trebleClefMedium = trebleClefInLines + "," + trebleClefInSpaces;
+const setupLevel = (clef: string, level: string): string => {
+    if (level === "easy") {
+        return clefIsTreble(clef) ? trebleClefEasy : bassClefEasy;
+    } else if (level === "medium") {
+        return clefIsTreble(clef) ? trebleClefMedium : bassClefMedium;
+    } else {
+        return clefIsTreble(clef) ? trebleClefHard : bassClefHard;
+    }
+}
 
-export const bassClefMedium:string = "c/2,d/2,e/2,f/2,g/2,a/2,b/2,c/3,d/3,e/3,f/3,g/3,a/3,b/3,c/4";
+const bassClefInSpaces: string = "a/2,b/1,b/3,c/1,c/3,d/2,e/1,e/3,g/1,g/3";
+const bassClefInLines: string = "a/1,a/3,c/2,c/4,b/2,d/1,d/3,e/2,f/1,g/2";
+
+const bassClefHard: string = bassClefInLines + "," + bassClefInSpaces;
+const bassClefEasy: string = "a/2,c/3,e/3,g/3,g/2,b/2,d/3,f/3,a/3";
+
+const trebleClefInLines: string = "a/3,c/4,e/4,g/4,b/4,d/5,f/5,a/5,c/6";//2 above and below ledger 
+const trebleClefInSpaces: string = "b/3,d/4,f/4,a/4,c/5,e/5,g/5,b/5";//2 above and below ledger 
+const trebleClefEasy = "e/4,g/4,b/4,d/5,f/5,f/4,a/4,c/5,e/5";
+const trebleClefMedium = trebleClefInLines + "," + trebleClefInSpaces;
+
+const trebleClefHard = "c/4,d/4,e/4,f/4,g/4,a/4,b/4,c/5,d/5,e/5,f/5,g/5,a/5,b/5,c/6,d/6,e/6,f/6,g/6,a/6,b/6,c/7,d/7,e/7,f/7,g/7,a/7,b/7"; //not including C8(used for reset)
+
+
+const bassClefMedium: string = "c/2,d/2,e/2,f/2,g/2,a/2,b/2,c/3,d/3,e/3,f/3,g/3,a/3,b/3,c/4";
 
 // cdefgab2
 // cdefgab3

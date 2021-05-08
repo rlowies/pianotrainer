@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import WebMidi, { InputEventNoteon } from 'webmidi';
 import Vex from 'vexflow';
-import { bassClefEasy, bassClefMedium, generateNotes, INote, randomSort, trebleClefMedium } from '../services/Note.service';
+import * as NoteService from '../services/Note.service'
+import { INote } from '../services/Note.service';
 import * as StaffService from '../services/Staff.service';
 import { StaffConfig } from '../services/Staff.service';
 import { useParams } from 'react-router-dom';
 import './Staff.css'
 
 const VF = Vex.Flow;
-const initialNotes: INote[] = generateNotes(bassClefEasy, false, 4, "bass");
+const initialNotes: INote[] = NoteService.generateNotes(false, 4, "bass", "easy");
 
 const initialStaffConfig: StaffConfig = {
     staff: new Vex.Flow.Stave(10, 40, 400),
@@ -30,7 +31,7 @@ export default function Staff(props: any) {
         var { staff, notes } = staffConfig;
 
         const resetStaff = (type: string, config: StaffConfig) => {
-            config.playableNotes = generateNotes(type === "bass" ? bassClefMedium : trebleClefMedium, true, 4, clefType);
+            config.playableNotes = NoteService.generateNotes(true, 4, clefType, level);
             config.notes = config.playableNotes.map(x => x.note);
             config.staff = new Vex.Flow.Stave(10, 40, 400);
             staff.getContext().clear();
@@ -108,7 +109,7 @@ export default function Staff(props: any) {
             <div className="all-staff">
                 <div id='staff' className="App" />
                 <div className="staff-buttons">
-                    {!hideButtons && staffConfig.playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(randomSort)}
+                    {!hideButtons && staffConfig.playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(NoteService.randomSort)}
                     <hr />
                     <button onClick={() => { setNote("C8") }}> Reset</button>
                     <button onClick={() => {
