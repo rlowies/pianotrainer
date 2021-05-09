@@ -13,7 +13,7 @@ function App() {
     <Router>
       <div>
         <div className="navbar">
-          <Link to="/">Home</Link>
+          <Link to="/">Home 2</Link>
           <Link to="/noteTraining">Note Training</Link>
         </div>
         <Switch>
