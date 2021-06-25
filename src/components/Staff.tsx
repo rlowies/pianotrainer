@@ -10,9 +10,11 @@ import './Staff.css'
 
 const VF = Vex.Flow;
 const initialNotes: INote[] = NoteService.generateNotes(false, 4, "bass", "easy");
+const staffX = 10;
+const staffY = 100;
 
 const initialStaffConfig: StaffConfig = {
-    staff: new Vex.Flow.Stave(10, 40, 400),
+    staff: new Vex.Flow.Stave(staffX, staffY, 400),
     currentNoteIndex: 0,
     numNotes: 4,
     playableNotes: initialNotes,
@@ -35,7 +37,7 @@ export default function Staff(props: any) {
         const resetStaff = (type: string, config: StaffConfig) => {
             config.playableNotes = NoteService.generateNotes(true, 4, clefType, level);
             config.notes = config.playableNotes.map(x => x.note);
-            config.staff = new Vex.Flow.Stave(10, 40, 400);
+            config.staff = new Vex.Flow.Stave(staffX, staffY, 400);
             var context = staff.getContext();
             context.clear();
             config.staff.addClef(type).addTimeSignature("4/4");
