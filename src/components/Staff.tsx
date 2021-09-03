@@ -1,15 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import WebMidi, { InputEventNoteon } from 'webmidi';
 import Vex from 'vexflow';
-import * as NoteService from '../services/Note.service'
-import { INote } from '../services/Note.service';
-import * as StaffService from '../services/Staff.service';
-import { StaffConfig } from '../services/Staff.service';
+import { generateNotes, randomSort, INote } from '../services/Note.service'
+import { updateNotes, initVoice, StaffConfig } from '../services/Staff.service';
 import { useParams } from 'react-router-dom';
 import './Staff.css'
 
 const VF = Vex.Flow;
-const initialNotes: INote[] = NoteService.generateNotes(false, 4, "bass", "easy");
+const initialNotes: INote[] = generateNotes(false, 4, "bass", "easy");
 const staffX = 10;
 const staffY = 100;
 
@@ -23,19 +21,20 @@ const initialStaffConfig: StaffConfig = {
 
 const canEnableMidi = navigator.userAgent.indexOf("Chrome") !== -1;
 
-export default function Staff(props: any) {
+export const Staff = (props: any) => {
     const [note, setNote] = useState<string>("");
     const [init, setInit] = useState<boolean>(false);
     const [hideButtons, setHideButtons] = useState<boolean>(false);
     const [staffConfig, setStaffConfig] = useState<StaffConfig>(initialStaffConfig);
     const [clefType, setClefType] = useState<string>("bass");
     let { level } = useParams<any>();
+    const staffRef = useRef(null);
 
     useEffect(() => {
         var { staff, notes } = staffConfig;
 
         const resetStaff = (type: string, config: StaffConfig) => {
-            config.playableNotes = NoteService.generateNotes(true, 4, clefType, level);
+            config.playableNotes = generateNotes(true, 4, clefType, level);
             config.notes = config.playableNotes.map(x => x.note);
             config.staff = new Vex.Flow.Stave(staffX, staffY, 400);
             var context = staff.getContext();
@@ -48,32 +47,26 @@ export default function Staff(props: any) {
 
         const updateStaff = () => {
             if (note !== "") {
-                let staffConfigUpdate: StaffConfig = {
-                    ...staffConfig
-                }
-
                 if (note === "C8") {
-                    resetStaff(clefType, staffConfigUpdate)
+                    resetStaff(clefType, staffConfig)
                     return;
                 }
 
-                var isCorrect = StaffService.updateNotes(staffConfig, note);
+                var isCorrect = updateNotes(staffConfig, note);
                 if (isCorrect) {
-                    staffConfigUpdate.currentNoteIndex++;
-                    setStaffConfig(staffConfigUpdate)
+                    setStaffConfig({ ...staffConfig, currentNoteIndex: staffConfig.currentNoteIndex + 1 })
                 }
             }
         }
 
         const Initialize = () => {
-            var div = document.getElementById("staff")!;
-            var renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
+            var renderer = new VF.Renderer(staffRef.current!, VF.Renderer.Backends.SVG);
             renderer.resize(420, 300);
             var context = renderer.getContext();
             staff.addClef(clefType).addTimeSignature("4/4");
             staff.setContext(context).draw();
 
-            if(canEnableMidi) {
+            if (canEnableMidi) {
                 WebMidi.enable(function (err) {
                     if (err) {
                         console.log("WebMidi could not be enabled.", err);
@@ -90,7 +83,6 @@ export default function Staff(props: any) {
                     }
                 });
             }
-
             setInit(true);
         }
 
@@ -99,7 +91,7 @@ export default function Staff(props: any) {
         }
 
         if (note === "") {
-            StaffService.initVoice(notes, staff);
+            initVoice(notes, staff);
         }
 
         setNote("");
@@ -109,7 +101,7 @@ export default function Staff(props: any) {
     useEffect(() => {
         setClefType(props.clef);
         setNote("C8");
-        if(canEnableMidi) {
+        if (canEnableMidi) {
             return () => {
                 WebMidi.disable()
             }
@@ -119,9 +111,9 @@ export default function Staff(props: any) {
     return (
         <>
             <div className="all-staff">
-                <div id='staff' className="App" />
+                <div className="App" ref={staffRef} />
                 <div className="staff-buttons">
-                    {!hideButtons && staffConfig.playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(NoteService.randomSort)}
+                    {!hideButtons && staffConfig.playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(randomSort)}
                     <hr />
                     <button onClick={() => { setNote("C8") }}> Reset</button>
                     <button onClick={() => {
@@ -131,8 +123,8 @@ export default function Staff(props: any) {
                     <button onClick={() => { setHideButtons(!hideButtons); }}> {`${!hideButtons ? "Piano" : "Manual"} Mode`}</button>
                 </div>
             </div>
-
         </>
     );
-
 }
+
+export default Staff;
