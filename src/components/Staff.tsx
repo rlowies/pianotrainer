@@ -2,44 +2,38 @@ import { useEffect, useState, useRef } from 'react';
 import WebMidi, { InputEventNoteon } from 'webmidi';
 import Vex from 'vexflow';
 import { generateNotes, randomSort, INote } from '../services/Note.service'
-import { updateNotes, initVoice, StaffConfig } from '../services/Staff.service';
+import { updateNotes, initVoice, StaffConfig, staffX, staffY} from '../services/Staff.service';
 import { useParams } from 'react-router-dom';
 import './Staff.css'
 
 const VF = Vex.Flow;
-const initialNotes: INote[] = generateNotes(false, 4, "bass", "easy");
-const staffX = 10;
-const staffY = 100;
-
-const initialStaffConfig: StaffConfig = {
-    staff: new Vex.Flow.Stave(staffX, staffY, 400),
-    currentNoteIndex: 0,
-    numNotes: 4,
-    playableNotes: initialNotes,
-    notes: initialNotes.map(x => x.note),
-}
-
 const canEnableMidi = navigator.userAgent.indexOf("Chrome") !== -1;
 
 export const Staff = (props: any) => {
     const [note, setNote] = useState<string>("");
     const [init, setInit] = useState<boolean>(false);
     const [hideButtons, setHideButtons] = useState<boolean>(false);
-    const [staffConfig, setStaffConfig] = useState<StaffConfig>(initialStaffConfig);
-    const [clefType, setClefType] = useState<string>("bass");
+    const [staffConfig, setStaffConfig] = useState<StaffConfig>(props.initialStaffConfig);
+    const [clefType, setClefType] = useState<string>("treble");
     let { level } = useParams<any>();
     const staffRef = useRef(null);
-
+    
     useEffect(() => {
-        var { staff, notes } = staffConfig;
+        const timeSignature = `${staffConfig.playableNotes.length}/4`;
+        var { staff, playableNotes } = staffConfig;
+        const numNotes = staffConfig.playableNotes.length
 
         const resetStaff = (type: string, config: StaffConfig) => {
-            config.playableNotes = generateNotes(true, 4, clefType, level);
-            config.notes = config.playableNotes.map(x => x.note);
-            config.staff = new Vex.Flow.Stave(staffX, staffY, 400);
+            if (level === "warmup") {
+                config.playableNotes = generateNotes(false, numNotes, clefType, level);
+            } else {
+                config.playableNotes = generateNotes(true, numNotes, clefType, level);
+            }
+
+            config.staff = new Vex.Flow.Stave(staffX, staffY, staffConfig.staff.getWidth());
             var context = staff.getContext();
             context.clear();
-            config.staff.addClef(type).addTimeSignature("4/4");
+            config.staff.addClef(type).addTimeSignature(timeSignature);
             config.staff.setContext(context).draw();
             config.currentNoteIndex = 0;
             setStaffConfig(config)
@@ -61,9 +55,9 @@ export const Staff = (props: any) => {
 
         const Initialize = () => {
             var renderer = new VF.Renderer(staffRef.current!, VF.Renderer.Backends.SVG);
-            renderer.resize(420, 300);
+            renderer.resize(staffConfig.staff.getWidth() + 50, 300);
             var context = renderer.getContext();
-            staff.addClef(clefType).addTimeSignature("4/4");
+            staff.addClef(clefType).addTimeSignature(timeSignature);
             staff.setContext(context).draw();
 
             if (canEnableMidi) {
@@ -91,7 +85,7 @@ export const Staff = (props: any) => {
         }
 
         if (note === "") {
-            initVoice(notes, staff);
+            initVoice(playableNotes.map(x => x.note), staff);
         }
 
         setNote("");

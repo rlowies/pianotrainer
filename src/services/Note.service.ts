@@ -8,8 +8,8 @@ export interface INote {
 
 export const generateNotes = (random: boolean = false, count: number, clef: string, level: string): INote[] => {
     var res: INote[] = [];
-    var allNotes = setupLevel(clef, level).split(",");
     const VF = Vex.Flow;
+    var allNotes = setupLevel(clef, level).split(",");
 
     if (random) {
         allNotes = allNotes.sort(randomSort)
@@ -19,11 +19,11 @@ export const generateNotes = (random: boolean = false, count: number, clef: stri
         var currentKey = allNotes[i];
 
         var noteToAdd: Vex.Flow.StaveNote = new VF.StaveNote({ clef: clef, keys: [currentKey], duration: "q", auto_stem: true });
-        if(currentKey.codePointAt(1) === 35) {
+        if (currentKey.codePointAt(1) === 35) {
             noteToAdd.addAccidental(0, new VF.Accidental("#"));
         }
 
-        if(currentKey.codePointAt(1) === 98) {
+        if (currentKey.codePointAt(1) === 98) {
             noteToAdd.addAccidental(0, new VF.Accidental("b"));
         }
 
@@ -44,6 +44,8 @@ const clefIsTreble = (clef: string) => {
 }
 
 const setupLevel = (clef: string, level: string): string => {
+    if (level === "warmup") return clefIsTreble(clef) ? warmUpTreble : warmUpBass;
+
     if (level === "easy") {
         return clefIsTreble(clef) ? trebleClefEasy : bassClefEasy;
     } else if (level === "medium") {
@@ -74,3 +76,6 @@ const bassClefMedium: string = "c/2,d/2,e/2,f/2,g/2,a/2,b/2,c/3,d/3,e/3,f/3,g/3,
 
 // cdefgab2
 // cdefgab3
+
+const warmUpTreble: string = "g/3,a/3,b/3,c/4,d/4,e/4,f/4,g/4,a/4,b/4,c/5,d/5,e/5,f/5,g/5,a/5";
+const warmUpBass: string = "b/1,c/2,d/2,e/2,f/2,g/2,a/2,b/2,c/3,d/3,e/3,f/3,g/3,a/3,b/3,c/4,d/4";

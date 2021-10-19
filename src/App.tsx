@@ -7,6 +7,9 @@ import {
   Link,
   useRouteMatch
 } from 'react-router-dom';
+import { generateNotes } from './services/Note.service';
+import {staffX, staffY} from './services/Staff.service';
+import Vex from 'vexflow';
 
 function App() {
   return (
@@ -15,10 +18,18 @@ function App() {
         <div className="navbar">
           <Link to="/">Home</Link>
           <Link to="/noteTraining">Note Training</Link>
+          <Link to="/warmup/warmup">Warm up</Link>
         </div>
         <Switch>
           <Route path="/noteTraining">
             <NoteTraining />
+          </Route>
+          <Route path="/warmup/:level">
+            <Staff clef={"treble"} initialStaffConfig={{
+              staff: new Vex.Flow.Stave(staffX, staffY, 500),
+              currentNoteIndex: 0,
+              playableNotes: generateNotes(false, 16, "treble", "warmup"),
+            }} />
           </Route>
           <Route path="/">
             Home
@@ -68,7 +79,11 @@ function Levels(props: any) {
           </div>
         </Route>
         <Route path={`${path}/:level`}>
-          <Staff reset={true} clef={props.clef} />
+          <Staff reset={true} clef={props.clef} initialStaffConfig={{
+            staff: new Vex.Flow.Stave(staffX, staffY, 400),
+            currentNoteIndex: 0,
+            playableNotes: generateNotes(false, 4, "bass", "easy"),
+          }} />
         </Route>
       </Switch>
     </div>
