@@ -15,7 +15,7 @@ export const staffY = 100;
 var red = { fillStyle: "#cc0000", strokeStyle: "#cc0000" };
 var green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
 
-export const initVoice = (notes: Vex.Flow.StaveNote[], staff: Vex.Flow.Stave) => {
+export const updateVoice = (notes: Vex.Flow.StaveNote[], staff: Vex.Flow.Stave) => {
     var voice = new VF.Voice({ num_beats: notes.length, beat_value: 4 });
     voice.addTickables(notes);
     // Format and justify the notes to 400 pixels.
@@ -23,7 +23,7 @@ export const initVoice = (notes: Vex.Flow.StaveNote[], staff: Vex.Flow.Stave) =>
     voice.draw(staff.getContext(), staff);
 }
 
-export const updateNotes = ({playableNotes, currentNoteIndex}: StaffConfig, note: string): boolean => {
+export const updateNotes = ({ playableNotes, currentNoteIndex }: StaffConfig, note: string): boolean => {
     var currentNoteToPlay: INote = playableNotes[currentNoteIndex];
     const notes = playableNotes.map(x => x.note);
     const numNotes = playableNotes.length;
