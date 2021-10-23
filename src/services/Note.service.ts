@@ -6,7 +6,12 @@ export interface INote {
     order: number;
 }
 
-export const generateNotes = (random: boolean = false, count: number, clef: string, level: string): INote[] => {
+export const generateNotes = (
+    random: boolean = false,
+    count: number,
+    clef: string,
+    level: string
+): INote[] => {
     var res: INote[] = [];
     const VF = Vex.Flow;
     var allNotes = setupLevel(clef, level).split(",");
