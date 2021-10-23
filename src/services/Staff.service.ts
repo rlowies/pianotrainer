@@ -1,4 +1,4 @@
-import { INote } from './Note.service';
+import { generateNotes, INote } from './Note.service';
 import Vex from 'vexflow';
 
 const VF = Vex.Flow;
@@ -38,4 +38,20 @@ export const updateNotes = ({playableNotes, currentNoteIndex}: StaffConfig, note
     }
 
     return false;
+}
+
+export const resetStaff = (type: string, config: StaffConfig, staffWidth: number, numNotes: number, level: string, timeSignature: string): StaffConfig => {
+    if (level === "warmup") {
+        config.playableNotes = generateNotes(false, numNotes, type, level);
+    } else {
+        config.playableNotes = generateNotes(true, numNotes, type, level);
+    }
+
+    var context = config.staff.getContext();
+    config.staff = new Vex.Flow.Stave(staffX, staffY, staffWidth);
+    context.clear();
+    config.staff.addClef(type).addTimeSignature(timeSignature);
+    config.staff.setContext(context).draw();
+    config.currentNoteIndex = 0;
+    return config;
 }
