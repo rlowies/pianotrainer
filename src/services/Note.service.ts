@@ -95,8 +95,8 @@ export const buildNoteString = (
     return result;
 }
 
-const bassClefInSpaces: string = "a/2,b/1,b/3,c/1,c/3,d/2,e/1,e/3,g/1,g/3";
-const bassClefInLines: string = "a/1,a/3,c/2,c/4,b/2,d/1,d/3,e/2,f/1,g/2";
+const bassClefInSpaces: string = "a/2,c/3,e/3,g/3,b/3,d/4,f/4,a/4,c/5,e/5";
+const bassClefInLines: string = "g/2,b/2,d/3,f/3,a/3,c/4,e/4,g/4,b/4,d/6";
 
 const bassClefHard: string = bassClefInLines + "," + bassClefInSpaces;
 const bassClefEasy: string = "a/2,c/3,e/3,g/3,g/2,b/2,d/3,f/3,a/3";

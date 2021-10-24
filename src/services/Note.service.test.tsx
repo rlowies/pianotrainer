@@ -32,7 +32,7 @@ it("Should build notes for medium mode in bass clef", () => {
 
 it("Should build notes for hard mode in bass clef", () => {
     const result = generateNotes(false, 20, "bass", "hard");
-    expect(result.map(e => e.name)).toEqual(["A1", "A3", "C2", "C4", "B2", "D1", "D3", "E2", "F1", "G2", "A2", "B1", "B3", "C1", "C3", "D2", "E1", "E3", "G1", "G3"])
+    expect(result.map(e => e.name)).toEqual(["G2", "B2", "D3", "F3", "A3", "C4", "E4", "G4", "B4", "D6", "A2", "C3", "E3", "G3", "B3", "D4", "F4", "A4", "C5", "E5"])
 })
 
 it("Should build notes for easy mode in treble clef", () => {
