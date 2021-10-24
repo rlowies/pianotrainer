@@ -69,6 +69,7 @@ export const buildNoteString = (
     octave: number,
     skip: boolean = false,
     accidental: "#" | "b" | undefined = undefined,
+    accidentalLocations: number[] | "all" = "all",
 ): string => {
     const ASCII_a = 97;
     const ASCII_g = 103;
@@ -95,7 +96,18 @@ export const buildNoteString = (
             octave++;
         }
 
-        const noteString = `${asciiNote}${accidental ? accidental : ""}/${octave}`;
+        let shouldAddAccidental = false;
+        if (accidental) {
+            if (accidentalLocations === "all") {
+                shouldAddAccidental = true;
+            } else {
+                if (accidentalLocations.includes(i + 1)) {
+                    shouldAddAccidental = true;
+                }
+            }
+        }
+
+        const noteString = `${asciiNote}${shouldAddAccidental ? accidental : ""}/${octave}`;
         result += numNotes === i + 1 ? noteString : `${noteString},`;
     }
 

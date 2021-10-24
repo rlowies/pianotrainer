@@ -22,6 +22,11 @@ it("Should build notes with accidentals", () => {
     expect(result).toBe("a#/3,c#/4,e#/4,g#/4")
 })
 
+it("Should build G scale notes with sharp on F", () => {
+    const result = buildNoteString(8, "g", 4, false, "#", [7]);
+    expect(result).toBe("g/4,a/4,b/4,c/5,d/5,e/5,f#/5,g/5")
+})
+
 it("Should build notes for warmup mode in treble clef", () => {
     const result = generateNotes(false, 16, Clef.Treble, Level.Warmup);
     expect(result.map(e => e.name)).toEqual(["G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5"])
