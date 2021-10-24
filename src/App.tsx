@@ -13,25 +13,27 @@ import { Level } from './types/levelType';
 function App() {
   return (
     <Router>
-        <div className="navbar">
-          <Link to="/">Home</Link>
-          <Link to="/noteTraining">Note Training</Link>
-          <Link to={`/warmup/${Level.Warmup}`}>Warm up</Link>
-        </div>
-        <Switch>
-          <Route path="/noteTraining">
-            <NoteTraining />
-          </Route>
-          <Route path="/warmup/:level">
-            <Staff
-              clef={Clef.Treble}
-              width={500}
-              numNotes={16} />
-          </Route>
-          <Route path="/">
-            Home
-          </Route>
-        </Switch>
+      <div className="navbar">
+        <Link to="/">Home</Link>
+        <Link to="/noteTraining">Note Training</Link>
+        <Link to={`/warmup/${Level.Warmup}`}>Warm up</Link>
+      </div>
+      <Switch>
+        <Route path="/noteTraining">
+          <NoteTraining />
+        </Route>
+        <Route path="/warmup/:level">
+          <Staff
+            clef={Clef.Treble}
+            width={500}
+            numNotes={16}
+            numMeasures={1}
+          />
+        </Route>
+        <Route path="/">
+          Home
+        </Route>
+      </Switch>
     </Router>
   );
 }
@@ -41,24 +43,24 @@ function NoteTraining() {
 
   return (
     <Router>
-        <div className="training-buttons">
-          <Link to={`${url}/${Clef.Treble}`}>Treble</Link>
-          <Link to={`${url}/${Clef.Bass}`}>Bass</Link>
-        </div>
-        <Switch>
-          <Route path={`${url}/${Clef.Treble}`}>
-            <Levels clef={Clef.Treble} />
-          </Route>
-          <Route path={`${url}/${Clef.Bass}`}>
-            <Levels clef={Clef.Bass} />
-          </Route>
-        </Switch>
+      <div className="training-buttons">
+        <Link to={`${url}/${Clef.Treble}`}>Treble</Link>
+        <Link to={`${url}/${Clef.Bass}`}>Bass</Link>
+      </div>
+      <Switch>
+        <Route path={`${url}/${Clef.Treble}`}>
+          <Levels clef={Clef.Treble} />
+        </Route>
+        <Route path={`${url}/${Clef.Bass}`}>
+          <Levels clef={Clef.Bass} />
+        </Route>
+      </Switch>
     </Router>
   );
 
 }
 
-function Levels(props: {clef: Clef}) {
+function Levels(props: { clef: Clef }) {
   let { path, url } = useRouteMatch();
 
   return (
@@ -76,7 +78,9 @@ function Levels(props: {clef: Clef}) {
           <Staff
             clef={props.clef}
             width={400}
-            numNotes={4} />
+            numNotes={4} 
+            numMeasures={1}
+            />
         </Route>
       </Switch>
     </div>

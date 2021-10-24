@@ -2,7 +2,6 @@ import Vex from 'vexflow'
 import { Level } from '../../types/levelType';
 import { Clef } from '../StaffService/Staff.service';
 
-
 export interface INote {
     note: Vex.Flow.StaveNote;
     name: string;
