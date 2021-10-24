@@ -4,7 +4,7 @@ import { generateNotes, randomSort, INote } from './../../services/NoteService/N
 import { updateNotes, updateVoice, StaffConfig, staffX, staffY, resetStaff, VF, Clef} from './../../services/StaffService/Staff.service';
 import { useParams } from 'react-router-dom';
 import './Staff.css'
-import { usePrevious } from '../../effects/usePreviousHook';
+import { usePrevious } from '../../hooks/usePreviousHook';
 import { Level, LevelType } from './../../types/levelType';
 import { RESET_NOTE } from './../../types/constants';
 
