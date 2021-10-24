@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import WebMidi, { InputEventNoteon } from 'webmidi';
 import { generateNotes, randomSort, INote } from './../../services/NoteService/Note.service'
-import { updateNotes, updateVoice, StaffConfig, staffX, staffY, resetStaff, VF, Clef} from './../../services/StaffService/Staff.service';
+import { updateNotes, updateVoice, StaffConfig, staffX, staffY, resetStaff, VF, Clef } from './../../services/StaffService/Staff.service';
 import { useParams } from 'react-router-dom';
 import './Staff.css'
 import { usePrevious } from '../../hooks/usePreviousHook';
@@ -70,7 +70,7 @@ export const Staff = ({ width, numNotes, clef }: StaffProps) => {
         if (note === RESET_NOTE) {
             const newConfig = resetStaff(clefType, staffConfig, width, numNotes, level, timeSignature)
             setStaffConfig(newConfig)
-            updateVoice(newConfig.playableNotes.map(x => x.note), newConfig.staff);
+            updateVoice(newConfig);
             setNote("");
             return;
         }
@@ -80,14 +80,19 @@ export const Staff = ({ width, numNotes, clef }: StaffProps) => {
                 setStaffConfig({ ...staffConfig, currentNoteIndex: staffConfig.currentNoteIndex + 1 })
             }
         }
-        updateVoice(staffConfig.playableNotes.map(x => x.note), staffConfig.staff);
+        updateVoice(staffConfig);
     }, [note, staffConfig, clefType, level, numNotes, width, timeSignature, previousNote])
 
     return (
         <div className="all-staff">
-            <div className="App" ref={staffRef} />
+            <div ref={staffRef} />
             <div className="staff-buttons">
-                {!hideButtons && staffConfig.playableNotes.map((x: INote, i: number) => <button key={i} onClick={() => setNote(x.name)}> Send {x.name}</button>).sort(randomSort)}
+                {!hideButtons && staffConfig.playableNotes.map((x: INote, i: number) =>
+                    <button
+                        key={i}
+                        onClick={() => setNote(x.name)}> Send {x.name}
+                    </button>
+                ).sort(randomSort)}
                 <hr />
                 <button onClick={() => { setNote(RESET_NOTE) }}> Reset</button>
                 <button onClick={() => {
