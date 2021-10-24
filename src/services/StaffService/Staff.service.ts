@@ -19,11 +19,10 @@ export const staffX = 10;
 export const staffY = 100;
 
 export const updateVoice = (
-    notes: Vex.Flow.StaveNote[],
-    staff: Vex.Flow.Stave
+    { playableNotes: notes, staff }: StaffConfig
 ) => {
     var voice = new VF.Voice({ num_beats: notes.length, beat_value: 4 });
-    voice.addTickables(notes);
+    voice.addTickables(notes.map(x => x.note));
     // Format and justify the notes to 400 pixels.
     new VF.Formatter().joinVoices([voice]).format([voice], 400);
     voice.draw(staff.getContext(), staff);
