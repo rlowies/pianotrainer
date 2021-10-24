@@ -1,5 +1,5 @@
 import './App.css';
-import Staff from './components/Staff';
+import Staff from './components/Staff/Staff';
 import {
   BrowserRouter as Router,
   Switch,
@@ -7,15 +7,16 @@ import {
   Link,
   useRouteMatch
 } from 'react-router-dom';
+import { Clef } from './services/StaffService/Staff.service';
+import { Level } from './types/levelType';
 
 function App() {
   return (
     <Router>
-      <div>
         <div className="navbar">
           <Link to="/">Home</Link>
           <Link to="/noteTraining">Note Training</Link>
-          <Link to="/warmup/warmup">Warm up</Link>
+          <Link to={`/warmup/${Level.Warmup}`}>Warm up</Link>
         </div>
         <Switch>
           <Route path="/noteTraining">
@@ -23,7 +24,7 @@ function App() {
           </Route>
           <Route path="/warmup/:level">
             <Staff
-              clef={"treble"}
+              clef={Clef.Treble}
               width={500}
               numNotes={16} />
           </Route>
@@ -31,7 +32,6 @@ function App() {
             Home
           </Route>
         </Switch>
-      </div>
     </Router>
   );
 }
@@ -41,26 +41,24 @@ function NoteTraining() {
 
   return (
     <Router>
-      <div>
         <div className="training-buttons">
-          <Link to={`${url}/treble`}>Treble</Link>
-          <Link to={`${url}/bass`}>Bass</Link>
+          <Link to={`${url}/${Clef.Treble}`}>Treble</Link>
+          <Link to={`${url}/${Clef.Bass}`}>Bass</Link>
         </div>
         <Switch>
-          <Route path={`${url}/treble`}>
-            <Levels clef="treble" />
+          <Route path={`${url}/${Clef.Treble}`}>
+            <Levels clef={Clef.Treble} />
           </Route>
-          <Route path={`${url}/bass`}>
-            <Levels clef="bass" />
+          <Route path={`${url}/${Clef.Bass}`}>
+            <Levels clef={Clef.Bass} />
           </Route>
         </Switch>
-      </div>
     </Router>
   );
 
 }
 
-function Levels(props: any) {
+function Levels(props: {clef: Clef}) {
   let { path, url } = useRouteMatch();
 
   return (
@@ -69,9 +67,9 @@ function Levels(props: any) {
         <Route exact path={path}>
           <div className="training-buttons">
             <h3>Please select a level.</h3>
-            <Link to={`${url}/easy`}>Easy</Link>
-            <Link to={`${url}/medium`}>Medium</Link>
-            <Link to={`${url}/hard`}>Hard</Link>
+            <Link to={`${url}/${Level.Easy}`}>Easy</Link>
+            <Link to={`${url}/${Level.Medium}`}>Medium</Link>
+            <Link to={`${url}/${Level.Hard}`}>Hard</Link>
           </div>
         </Route>
         <Route path={`${path}/:level`}>
