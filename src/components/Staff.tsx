@@ -1,19 +1,17 @@
 import { useEffect, useState, useRef } from 'react';
 import WebMidi, { InputEventNoteon } from 'webmidi';
-import Vex from 'vexflow';
 import { generateNotes, randomSort, INote } from '../services/Note.service'
-import { updateNotes, updateVoice, StaffConfig, staffX, staffY, resetStaff } from '../services/Staff.service';
+import { updateNotes, updateVoice, StaffConfig, staffX, staffY, resetStaff, VF} from '../services/Staff.service';
 import { useParams } from 'react-router-dom';
 import './Staff.css'
 import { usePrevious } from '../effects/effect.service';
 
-const VF = Vex.Flow;
 const canEnableMidi = navigator.userAgent.indexOf("Chrome") !== -1;
 
 interface StaffProps {
     width: number;
     numNotes: number;
-    clef: string;
+    clef: "bass" | "treble";
 }
 
 export const Staff = ({ width, numNotes, clef }: StaffProps) => {
@@ -22,7 +20,7 @@ export const Staff = ({ width, numNotes, clef }: StaffProps) => {
     const [clefType, setClefType] = useState<string>(clef);
     let { level } = useParams<any>();
     const [staffConfig, setStaffConfig] = useState<StaffConfig>({
-        staff: new Vex.Flow.Stave(staffX, staffY, width),
+        staff: new VF.Stave(staffX, staffY, width),
         currentNoteIndex: 0,
         playableNotes: generateNotes(false, numNotes, clef, level)
     });

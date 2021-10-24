@@ -1,7 +1,7 @@
 import { generateNotes, INote } from './Note.service';
 import Vex from 'vexflow';
 
-const VF = Vex.Flow;
+export const VF = Vex.Flow;
 
 export interface StaffConfig {
     staff: Vex.Flow.Stave;
@@ -11,9 +11,6 @@ export interface StaffConfig {
 
 export const staffX = 10;
 export const staffY = 100;
-
-var red = { fillStyle: "#cc0000", strokeStyle: "#cc0000" };
-var green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
 
 export const updateVoice = (
     notes: Vex.Flow.StaveNote[],
@@ -30,6 +27,9 @@ export const updateNotes = (
     { playableNotes, currentNoteIndex }: StaffConfig,
     note: string
 ): boolean => {
+    var red = { fillStyle: "#cc0000", strokeStyle: "#cc0000" };
+    var green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
+
     var currentNoteToPlay: INote = playableNotes[currentNoteIndex];
     const notes = playableNotes.map(x => x.note);
     const numNotes = playableNotes.length;
