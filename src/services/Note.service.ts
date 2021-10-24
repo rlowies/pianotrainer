@@ -60,6 +60,41 @@ const setupLevel = (clef: string, level: string): string => {
     }
 }
 
+export const buildNoteString = (
+    numNotes: number,
+    initialNote: string,
+    octave: number
+): string => {
+    const ASCII_a = 97;
+    const ASCII_g = 103;
+    let result = "";
+    // const start = initialNote.charCodeAt(0); //a.charCodeAt(0) = 97
+    //String.fromCharCode(97) = a
+    for (let i = 0; i < numNotes; i++) {
+        const noteIndex = (initialNote.charCodeAt(0) + (i % 7)) % ASCII_g;
+        
+        let decimalNote = 0;
+
+        if (noteIndex === 0) {
+            decimalNote = ASCII_g;
+        } else if (noteIndex < ASCII_a) {
+            decimalNote += ASCII_a + noteIndex - 1;
+        } else {
+            decimalNote = noteIndex;
+        }
+        
+        const asciiNote = String.fromCharCode(decimalNote);
+
+        if (asciiNote === "c") {
+            octave++;
+        }
+
+        const noteString = `${asciiNote}/${octave}`;
+        result += numNotes === i + 1 ? noteString : `${noteString},`;
+    }
+    return result;
+}
+
 const bassClefInSpaces: string = "a/2,b/1,b/3,c/1,c/3,d/2,e/1,e/3,g/1,g/3";
 const bassClefInLines: string = "a/1,a/3,c/2,c/4,b/2,d/1,d/3,e/2,f/1,g/2";
 
@@ -70,17 +105,13 @@ const trebleClefInLines: string = "a/3,c/4,e/4,g/4,b/4,d/5,f/5,a/5,c/6";//2 abov
 const trebleClefInSpaces: string = "b/3,d/4,f/4,a/4,c/5,e/5,g/5,b/5";//2 above and below ledger 
 const trebleClefEasy = "e/4,g/4,b/4,d/5,f/5,f/4,a/4,c/5,e/5";
 const trebleClefMedium = trebleClefInLines + "," + trebleClefInSpaces;
+const trebleClefHard = buildNoteString(28, "c", 3); //not including C8(used for reset)
 
-const trebleClefHard = "c/4,d/4,e/4,f/4,g/4,a/4,b/4,c/5,d/5,e/5,f/5,g/5,a/5,b/5,c/6,d/6,e/6,f/6,g/6,a/6,b/6,c/7,d/7,e/7,f/7,g/7,a/7,b/7"; //not including C8(used for reset)
 
-
-const bassClefMedium: string = "c/2,d/2,e/2,f/2,g/2,a/2,b/2,c/3,d/3,e/3,f/3,g/3,a/3,b/3,c/4";
+const bassClefMedium: string = buildNoteString(15, "c", 2)
 // const bassClefSharps = "c#/1,d#/1,f#/1,g#/1,a#/1,c#/2,d#/2,f#/2,g#/2,a#/2,c#/3,d#/3,f#/3,g#/3,a#/3";
 // const bassClefFlats = "db/1,eb/1,gb/1,ab/1,bb/1,db/2,eb/2,gb/2,ab/2,bb/2,db/3,eb/3,gb/3,ab/3,bb/3";
 // const bassClefAll = bassClefHard + "," + bassClefFlats + "," + bassClefSharps;
 
-// cdefgab2
-// cdefgab3
-
-const warmUpTreble: string = "g/3,a/3,b/3,c/4,d/4,e/4,f/4,g/4,a/4,b/4,c/5,d/5,e/5,f/5,g/5,a/5";
-const warmUpBass: string = "b/1,c/2,d/2,e/2,f/2,g/2,a/2,b/2,c/3,d/3,e/3,f/3,g/3,a/3,b/3,c/4,d/4";
+const warmUpTreble: string = buildNoteString(16, "g", 3);
+const warmUpBass: string = buildNoteString(16, "b", 1);

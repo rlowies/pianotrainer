@@ -19,7 +19,7 @@ interface StaffProps {
 export const Staff = ({ width, numNotes, clef }: StaffProps) => {
     const [note, setNote] = useState<string>("");
     const [hideButtons, setHideButtons] = useState<boolean>(false);
-    const [clefType, setClefType] = useState<string>("treble");
+    const [clefType, setClefType] = useState<string>(clef);
     let { level } = useParams<any>();
     const [staffConfig, setStaffConfig] = useState<StaffConfig>({
         staff: new Vex.Flow.Stave(staffX, staffY, width),
@@ -81,7 +81,6 @@ export const Staff = ({ width, numNotes, clef }: StaffProps) => {
             }
         }
         updateVoice(staffConfig.playableNotes.map(x => x.note), staffConfig.staff);
-
     }, [note, staffConfig, clefType, level, numNotes, width, timeSignature, previousNote])
 
     return (
