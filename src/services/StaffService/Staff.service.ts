@@ -2,6 +2,7 @@ import { generateNotes, INote } from '../NoteService/Note.service';
 import Vex from 'vexflow';
 import { Level } from '../../types/levelType';
 import { StaffMeasure } from '../../types/staffMeasure';
+import { RANDOMIZE_LEVELS } from '../../types/constants';
 
 export const VF = Vex.Flow;
 
@@ -19,14 +20,14 @@ export const staffX = 10;
 export const staffY = 100;
 
 export const updateVoice = (
-    { staffs }: StaffConfig
+    { staffs }: StaffConfig,
 ) => {
     staffs.forEach(staff => {
         const notes = staff.playableNotes;
         var voice = new VF.Voice({ num_beats: notes.length, beat_value: 4 });
         voice.addTickables(notes.map(x => x.note));
         // Format and justify the notes to 400 pixels.
-        new VF.Formatter().joinVoices([voice]).format([voice], 400);
+        new VF.Formatter().joinVoices([voice]).format([voice], staffs.length > 1 ? 300 : 400);
         voice.draw(staff.staff.getContext(), staff.staff);
     });
 }
@@ -40,9 +41,11 @@ export const updateNotes = (
     var green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
     var currentNoteToPlay: INote = playableNotes[currentNoteIndex];
     const notes = playableNotes.map(x => x.note);
+    if (notes.every((n: any) => n?.style?.fillStyle === green.fillStyle)) return true;
+    // console.log(notes.every((n: any) => n?.style?.fillStyle === green.fillStyle));
     const numNotes = playableNotes.length;
-
-    if (currentNoteIndex < numNotes && currentNoteIndex === currentNoteToPlay.order) {
+    //TODO: bug with order, if another note is sent after final note.
+    if (currentNoteIndex < numNotes && currentNoteIndex === currentNoteToPlay.order % numNotes) {
         if (note === currentNoteToPlay.name) {
             notes[currentNoteIndex].setStyle(green);
             return true;
@@ -60,14 +63,16 @@ export const resetStaff = (
     staffWidth: number,
     numNotes: number,
     level: Level,
-    timeSignature: string
+    timeSignature: string,
+    numMeasures: number,
 ): StaffConfig => {
     var context = config.staffs[0].staff.getContext();
     context.clear();
+    const measures = getMeasures(staffWidth, level, numNotes, type, numMeasures);
 
     config.staffs.forEach((staffType: StaffMeasure, i: number) => {
-        staffType.playableNotes = generateNotes(level !== Level.Warmup, numNotes, type, level);
-        staffType.staff = new Vex.Flow.Stave(staffX, i === 0 ? staffY : staffY + 100, staffWidth);
+        staffType.playableNotes = measures[i].playableNotes;
+        staffType.staff = measures[i].staff;
 
         if (i === 0) {
             staffType.staff.addClef(type).addTimeSignature(timeSignature);
@@ -87,17 +92,20 @@ export const getMeasures = (
     clef: Clef,
     numMeasures: number
 ): StaffMeasure[] => {
+    let allNotes = generateNotes(RANDOMIZE_LEVELS.includes(level), numNotes, clef, level);
+    let [a, b, c, d, e, f, g, h] = allNotes;
+
     let measures: StaffMeasure[] = [
         {
             staff: new VF.Stave(staffX, staffY, width),
-            playableNotes: generateNotes(level !== Level.Warmup, numNotes, clef, level)
+            playableNotes: numMeasures > 1 ? [a, b ,c, d] : allNotes
         }
     ]
 
     if (numMeasures > 1) {
         measures.push({
-            staff: new VF.Stave(staffX, staffY + 100, width),
-            playableNotes: generateNotes(level !== Level.Warmup, numNotes, clef, level)
+            staff: new VF.Stave(staffX + width, staffY, width),
+            playableNotes: [e, f, g, h]
         });
     }
 

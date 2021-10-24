@@ -52,7 +52,10 @@ const clefIsTreble = (clef: Clef) => {
 
 const setupLevel = (clef: Clef, level: string): string => {
     if (level === Level.Warmup) return clefIsTreble(clef) ? warmUpTreble : warmUpBass;
-
+    if (level === Level.C_Major) return clefIsTreble(clef) ? buildNoteString(8, "c", 4, false) : buildNoteString(8, "c", 2, false);
+    if (level === Level.G_Major) return clefIsTreble(clef) ? buildNoteString(8, "g", 4, false, "#", [7]) : buildNoteString(8, "g", 2, false, "#", [7]);
+    if (level === Level.D_Major) return clefIsTreble(clef) ? buildNoteString(8, "d", 4, false, "#", [3,7]) : buildNoteString(8, "d", 2, false, "#", [3,7]);
+   
     if (level === Level.Easy) {
         return clefIsTreble(clef) ? trebleClefEasy : bassClefEasy;
     } else if (level === Level.Medium) {

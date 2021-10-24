@@ -13,12 +13,13 @@ const canEnableMidi = navigator.userAgent.indexOf("Chrome") !== -1;
 
 interface StaffProps {
     width: number;
+    rendererWidth: number;
     numNotes: number;
     clef: Clef;
     numMeasures: number;
 }
 
-export const Staff = ({ width, numNotes, clef, numMeasures }: StaffProps) => {
+export const Staff = ({ width, numNotes, clef, numMeasures, rendererWidth }: StaffProps) => {
     const [note, setNote] = useState<string>("");
     const [hideButtons, setHideButtons] = useState<boolean>(false);
     const [clefType, setClefType] = useState<Clef>(clef);
@@ -29,13 +30,14 @@ export const Staff = ({ width, numNotes, clef, numMeasures }: StaffProps) => {
     });
     const staffRef = useRef(null);
     var { staffs } = staffConfig;
-    const timeSignature = `${numNotes}/4`;
+    const notesPerMeasure = numNotes / numMeasures;
+    const timeSignature = `${notesPerMeasure}/4`;
     const previousNote = usePrevious(note);
 
     //This is just initializing
     useEffect(() => {
         var renderer = new VF.Renderer(staffRef.current!, VF.Renderer.Backends.SVG);
-        renderer.resize(width + 50, 300);
+        renderer.resize(rendererWidth, 300);
         var context = renderer.getContext();
         staffs.forEach(({ staff }: StaffMeasure, i: number) => {
             if (i === 0) {
@@ -74,21 +76,21 @@ export const Staff = ({ width, numNotes, clef, numMeasures }: StaffProps) => {
     //Updates the staff when a note is sent
     useEffect(() => {
         if (note === RESET_NOTE) {
-            const newConfig = resetStaff(clefType, staffConfig, width, numNotes, level, timeSignature)
+            const newConfig = resetStaff(clefType, staffConfig, width, numNotes, level, timeSignature, numMeasures)
             setStaffConfig(newConfig)
             updateVoice(newConfig);
             setNote("");
             return;
         }
         if (note !== "" && note !== previousNote) {
-            var isCorrect = updateNotes(staffConfig.staffs[staffConfig.currentNoteIndex > numNotes - 1 ? 1 : 0].playableNotes, staffConfig.currentNoteIndex % numNotes, note);
+            var isCorrect = updateNotes(staffConfig.staffs[staffConfig.currentNoteIndex > notesPerMeasure - 1 ? 1 : 0].playableNotes, staffConfig.currentNoteIndex % notesPerMeasure, note);
             if (isCorrect) {
                 setStaffConfig({ ...staffConfig, currentNoteIndex: staffConfig.currentNoteIndex + 1 })
             }
             setNote(""); //Clear note for next note
         }
         updateVoice(staffConfig);
-    }, [note, staffConfig, clefType, level, numNotes, width, timeSignature, previousNote])
+    }, [note, staffConfig, clefType, level, numNotes, width, timeSignature, previousNote, numMeasures, notesPerMeasure])
 
     return (
         <div className="all-staff">
