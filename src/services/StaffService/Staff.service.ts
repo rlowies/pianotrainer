@@ -41,10 +41,10 @@ export const updateNotes = (
     var green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
     var currentNoteToPlay: INote = playableNotes[currentNoteIndex];
     const notes = playableNotes.map(x => x.note);
+    //fixes bug with currentNoteToPlay.order, if another note is sent after final note.
     if (notes.every((n: any) => n?.style?.fillStyle === green.fillStyle)) return true;
-    // console.log(notes.every((n: any) => n?.style?.fillStyle === green.fillStyle));
+
     const numNotes = playableNotes.length;
-    //TODO: bug with order, if another note is sent after final note.
     if (currentNoteIndex < numNotes && currentNoteIndex === currentNoteToPlay.order % numNotes) {
         if (note === currentNoteToPlay.name) {
             notes[currentNoteIndex].setStyle(green);
