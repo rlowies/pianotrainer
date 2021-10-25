@@ -1,4 +1,5 @@
 import Vex from 'vexflow'
+import { SCALE_LEVELS } from '../../types/constants';
 import { Level } from '../../types/levelType';
 import { Clef } from '../StaffService/Staff.service';
 
@@ -50,18 +51,55 @@ const clefIsTreble = (clef: Clef) => {
     return clef === Clef.Treble;
 }
 
-const setupLevel = (clef: Clef, level: string): string => {
-    if (level === Level.Warmup) return clefIsTreble(clef) ? warmUpTreble : warmUpBass;
-    if (level === Level.C_Major) return clefIsTreble(clef) ? buildNoteString(8, "c", 4, false) : buildNoteString(8, "c", 2, false);
-    if (level === Level.G_Major) return clefIsTreble(clef) ? buildNoteString(8, "g", 4, false, "#", [7]) : buildNoteString(8, "g", 2, false, "#", [7]);
-    if (level === Level.D_Major) return clefIsTreble(clef) ? buildNoteString(8, "d", 4, false, "#", [3,7]) : buildNoteString(8, "d", 2, false, "#", [3,7]);
-   
+const setupLevel = (clef: Clef, level: Level): string => {
+    const isTrebleClef = clefIsTreble(clef);
+
+    if (level === Level.Warmup) return isTrebleClef ? warmUpTreble : warmUpBass;
+
+    if (SCALE_LEVELS.includes(level)) return scaleLevel(level, isTrebleClef);
+
     if (level === Level.Easy) {
-        return clefIsTreble(clef) ? trebleClefEasy : bassClefEasy;
+        return isTrebleClef ? trebleClefEasy : bassClefEasy;
     } else if (level === Level.Medium) {
-        return clefIsTreble(clef) ? trebleClefMedium : bassClefMedium;
+        return isTrebleClef ? trebleClefMedium : bassClefMedium;
     } else {
-        return clefIsTreble(clef) ? trebleClefHard : bassClefHard;
+        return isTrebleClef ? trebleClefHard : bassClefHard;
+    }
+}
+
+const scaleLevel = (level: Level, isTrebleClef: boolean): string => {
+    const octave = isTrebleClef ? 4 : 2;
+    switch (level) {
+        case Level.C_Major:
+            return buildNoteString(8, "c", octave, false);
+        case Level.G_Major:
+            return buildNoteString(8, "g", octave, false, "#", [7]);
+        case Level.D_Major:
+            return buildNoteString(8, "d", octave, false, "#", [3, 7]);
+        case Level.A_Major:
+            return buildNoteString(8, "a", octave, false, "#", [3, 6, 7]);
+        case Level.E_Major:
+            return buildNoteString(8, "e", octave, false, "#", [2, 3, 6, 7]);
+        case Level.B_Major:
+            return buildNoteString(8, "b", octave, false, "#", [2, 3, 5, 6, 7]);
+        case Level.F_Sharp_Major:
+            return buildNoteString(8, "f", octave, false, "#", [1, 2, 3, 5, 6, 7, 8]);
+        case Level.G_Flat_Major:
+            return buildNoteString(8, "g", octave, false, "b", [1, 2, 3, 4, 5, 6, 8]);
+        case Level.D_Flat_Major:
+            return buildNoteString(8, "d", octave, false, "b", [1, 2, 4, 5, 6, 8]);
+        case Level.C_Sharp_Major:
+            return buildNoteString(8, "c", octave, false, "#", "all");
+        case Level.A_Flat_Major:
+            return buildNoteString(8, "a", octave, false, "b", [1, 2, 4, 5, 8]);
+        case Level.E_Flat_Major:
+            return buildNoteString(8, "e", octave, false, "b", [1, 4, 5, 8]);
+        case Level.B_Flat_Major:
+            return buildNoteString(8, "b", octave, false, "b", [1, 4, 8]);
+        case Level.F_Major:
+            return buildNoteString(8, "f", octave, false, "b", [4]);
+        default:
+            return buildNoteString(8, "c", octave, false);
     }
 }
 
