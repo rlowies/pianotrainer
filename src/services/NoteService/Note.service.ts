@@ -155,7 +155,6 @@ export const buildNoteString = (
         let temp = result.split(",");
         let newResult = "";
         for (let i = 0; i < temp.length; i += 2) {
-
             newResult += i === temp.length - 2 ? temp[i] : `${temp[i]},`;
         }
 
@@ -165,20 +164,17 @@ export const buildNoteString = (
     return result;
 }
 
-// const bassClefSharps = buildNoteString(10, "c", 3, true, "#");
-// const bassClefFlats = buildNoteString(10, "c", 3, true, "b");
+const bassClefInLines = buildNoteString(10, "g", 2, true);
+const bassClefInSpaces = buildNoteString(10, "a", 2, true);
+const bassClefEasy = buildNoteString(4, "a", 2, true) + "," + buildNoteString(5, "g", 2, true);
+const bassClefMedium = buildNoteString(15, "c", 3)
+const bassClefHard = bassClefInLines + "," + bassClefInSpaces;
 
-const bassClefInLines: string = buildNoteString(10, "g", 2, true);
-const bassClefInSpaces: string = buildNoteString(10, "a", 2, true);
-const bassClefEasy: string = buildNoteString(4, "a", 2, true) + "," + buildNoteString(5, "g", 2, true);
-const bassClefMedium: string = buildNoteString(15, "c", 3)
-const bassClefHard: string = bassClefInLines + "," + bassClefInSpaces;
-
-const trebleClefInLines: string = buildNoteString(9, "a", 3, true);
-const trebleClefInSpaces: string = buildNoteString(8, "b", 3, true);
+const trebleClefInLines = buildNoteString(9, "a", 3, true);
+const trebleClefInSpaces = buildNoteString(8, "b", 3, true);
 const trebleClefEasy = buildNoteString(5, "e", 4, true) + "," + buildNoteString(4, "f", 4, true);
 const trebleClefMedium = trebleClefInLines + "," + trebleClefInSpaces;
 const trebleClefHard = buildNoteString(28, "c", 4);
 
-const warmUpTreble: string = buildNoteString(16, "g", 3);
-const warmUpBass: string = buildNoteString(16, "b", 1);
+const warmUpTreble = buildNoteString(16, "g", 3);
+const warmUpBass = buildNoteString(16, "b", 1);

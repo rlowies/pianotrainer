@@ -83,7 +83,11 @@ export const Staff = ({ width, numNotes, clef, numMeasures, rendererWidth }: Sta
             return;
         }
         if (note !== "" && note !== previousNote) {
-            var isCorrect = updateNotes(staffConfig.staffs[staffConfig.currentNoteIndex > notesPerMeasure - 1 ? 1 : 0].playableNotes, staffConfig.currentNoteIndex % notesPerMeasure, note);
+            let currentStaffIndex = 0;
+            if (numMeasures > 1) {
+               currentStaffIndex = staffConfig.currentNoteIndex >= notesPerMeasure ? 1 : 0;
+            }
+            var isCorrect = updateNotes(staffConfig.staffs[currentStaffIndex].playableNotes, staffConfig.currentNoteIndex % notesPerMeasure, note);
             if (isCorrect) {
                 setStaffConfig({ ...staffConfig, currentNoteIndex: staffConfig.currentNoteIndex + 1 })
             }
