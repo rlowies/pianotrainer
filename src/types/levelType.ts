@@ -13,5 +13,12 @@ export enum Level {
    A_Major = "a_major",
    E_Major = "e_major",
    B_Major = "b_major",
-   F_Sharp_Major = "f#_major",
+   F_Sharp_Major = "f_sharp_major",
+   G_Flat_Major = "fb_major",
+   D_Flat_Major = "db_major",
+   C_Sharp_Major = "c_sharp_major",
+   A_Flat_Major = "ab_major",
+   E_Flat_Major = "eb_major",
+   B_Flat_Major = "bb_major",
+   F_Major = "f_major",
 }

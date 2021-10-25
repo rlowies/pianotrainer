@@ -126,7 +126,18 @@ function Scales(props: { clef: Clef }) {
             <h3>Please select a level.</h3>
             <Link to={`${url}/${Level.C_Major}`}>C Major</Link>
             <Link to={`${url}/${Level.G_Major}`}>G Major</Link> 
-            <Link to={`${url}/${Level.D_Major}`}>D Major</Link> 
+            <Link to={`${url}/${Level.D_Major}`}>D Major</Link>
+            <Link to={`${url}/${Level.A_Major}`}>A Major</Link> 
+            <Link to={`${url}/${Level.E_Major}`}>E Major</Link> 
+            <Link to={`${url}/${Level.B_Major}`}>B Major</Link> 
+            <Link to={`${url}/${Level.F_Sharp_Major}`}>F# Major</Link> 
+            <Link to={`${url}/${Level.G_Flat_Major}`}>Gb Major</Link> 
+            <Link to={`${url}/${Level.D_Flat_Major}`}>Db Major</Link> 
+            <Link to={`${url}/${Level.C_Sharp_Major}`}>C# Major</Link> 
+            <Link to={`${url}/${Level.A_Flat_Major}`}>Ab Major</Link> 
+            <Link to={`${url}/${Level.E_Flat_Major}`}>Eb Major</Link> 
+            <Link to={`${url}/${Level.B_Flat_Major}`}>Bb Major</Link> 
+            <Link to={`${url}/${Level.F_Major}`}>F Major</Link> 
           </div>
         </Route>
         <Route path={`${path}/:level`}>

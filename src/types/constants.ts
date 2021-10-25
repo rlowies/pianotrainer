@@ -9,5 +9,12 @@ export const SCALE_LEVELS = [
     Level.A_Major,
     Level.E_Major,
     Level.B_Major,
-    Level.F_Sharp_Major
+    Level.F_Sharp_Major,
+    Level.G_Flat_Major,
+    Level.D_Flat_Major,
+    Level.C_Sharp_Major,
+    Level.A_Flat_Major,
+    Level.E_Flat_Major,
+    Level.B_Flat_Major,
+    Level.F_Major,
 ]
