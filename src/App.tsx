@@ -24,27 +24,25 @@ function App() {
         <Route path="/noteTraining">
           <NoteTraining />
         </Route>
-        <Route path="/warmup/:level">
-          <Staff
-            initialClef={Clef.Treble}
-            width={500}
-            numNotes={16}
-            numMeasures={1}
-            rendererWidth={550}
-          />
+        <Route path="/warmup/:level" component={() => <Staff
+          initialClef={Clef.Treble}
+          width={500}
+          numNotes={16}
+          numMeasures={1}
+          rendererWidth={550}
+        />}>
         </Route>
         <Route path="/scales">
           <ScaleTraining />
         </Route>
-        <Route path="/grand/:level">
-          <Staff
-            initialClef={Clef.Grand}
-            width={400}
-            numNotes={4}
-            numMeasures={2}
-            rendererWidth={450}
-            rendererHeight={500}
-          />
+        <Route path="/grand/:level" component={() => <Staff
+          initialClef={Clef.Grand}
+          width={400}
+          numNotes={4}
+          numMeasures={2}
+          rendererWidth={450}
+          rendererHeight={500}
+        />}>
         </Route>
         <Route path="/">
           Home
