@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import WebMidi, { InputEventNoteon } from 'webmidi';
 import { randomSort, INote } from './../../services/NoteService/Note.service'
-import { updateNotes, updateVoice, StaffConfig, getMeasures, resetStaff, VF, Clef } from './../../services/StaffService/Staff.service';
+import { updateNotes, updateVoice, StaffConfig, getMeasures, resetStaff, VF, Clef, getBassAndTrebleClef, renderGrandStaff } from './../../services/StaffService/Staff.service';
 import { useParams } from 'react-router-dom';
 import './Staff.css'
 import { usePrevious } from '../../hooks/usePreviousHook';
@@ -15,33 +15,47 @@ interface StaffProps {
     width: number;
     rendererWidth: number;
     numNotes: number;
-    clef: Clef;
+    initialClef: Clef;
     numMeasures: number;
+    rendererHeight?: number;
 }
 
-export const Staff = ({ width, numNotes, clef, numMeasures, rendererWidth }: StaffProps) => {
+export const Staff = ({
+    width,
+    numNotes,
+    initialClef,
+    numMeasures,
+    rendererWidth,
+    rendererHeight
+}: StaffProps) => {
     const [note, setNote] = useState<string>("");
     const [hideButtons, setHideButtons] = useState<boolean>(false);
-    const [clefType, setClefType] = useState<Clef>(clef);
+    const [clefType, setClefType] = useState<Clef>(initialClef === Clef.Grand ? Clef.Treble : initialClef);
     let { level } = useParams<LevelType>();
     const [staffConfig, setStaffConfig] = useState<StaffConfig>({
-        staffs: getMeasures(width, level, numNotes, clefType, numMeasures),
+        staffs: initialClef === Clef.Grand
+            ? getBassAndTrebleClef(width, level, numNotes)
+            : getMeasures(width, level, numNotes, clefType, numMeasures),
         currentNoteIndex: 0,
     });
     const staffRef = useRef(null);
     var { staffs } = staffConfig;
     const notesPerMeasure = numNotes / numMeasures;
-    const timeSignature = `${notesPerMeasure}/4`;
+    const timeSignature = `${initialClef === Clef.Grand ? numNotes : notesPerMeasure}/4`;
     const previousNote = usePrevious(note);
 
     //This is just initializing
     useEffect(() => {
         var renderer = new VF.Renderer(staffRef.current!, VF.Renderer.Backends.SVG);
-        renderer.resize(rendererWidth, 300);
+        renderer.resize(rendererWidth, rendererHeight ?? 300);
         var context = renderer.getContext();
         staffs.forEach(({ staff }: StaffMeasure, i: number) => {
             if (i === 0) {
                 staff.addClef(clefType).addTimeSignature(timeSignature);
+            }
+            if (i === 1 && initialClef === Clef.Grand) {
+                staff.addClef(Clef.Bass).addTimeSignature(timeSignature);
+                renderGrandStaff(context, staffs);
             }
             staff.setContext(context).draw();
         });
@@ -76,7 +90,7 @@ export const Staff = ({ width, numNotes, clef, numMeasures, rendererWidth }: Sta
     //Updates the staff when a note is sent
     useEffect(() => {
         if (note === RESET_NOTE) {
-            const newConfig = resetStaff(clefType, staffConfig, width, numNotes, level, timeSignature, numMeasures)
+            const newConfig = resetStaff(initialClef === Clef.Grand ? initialClef : clefType, staffConfig, width, numNotes, level, timeSignature, numMeasures)
             setStaffConfig(newConfig)
             updateVoice(newConfig);
             setNote("");
@@ -84,17 +98,29 @@ export const Staff = ({ width, numNotes, clef, numMeasures, rendererWidth }: Sta
         }
         if (note !== "" && note !== previousNote) {
             let currentStaffIndex = 0;
-            if (numMeasures > 1) {
-               currentStaffIndex = staffConfig.currentNoteIndex >= notesPerMeasure ? 1 : 0;
+            let isCorrect = false;
+            if (initialClef !== Clef.Grand) {
+                if (numMeasures > 1) {
+                    currentStaffIndex = staffConfig.currentNoteIndex >= notesPerMeasure ? 1 : 0;
+                }
+                isCorrect = updateNotes(staffConfig.staffs[currentStaffIndex].playableNotes, staffConfig.currentNoteIndex % notesPerMeasure, note);
+            } else {
+                const currentOctave = +note.substr(1, 1);
+                const currentStaff = staffConfig.staffs[currentOctave >= 4 ? 0 : 1];
+                isCorrect = updateNotes(currentStaff.playableNotes, currentStaff.currentStaffNoteIndex, note)
+
+                if (isCorrect) {
+                    currentStaff.currentStaffNoteIndex += 1;
+                }
             }
-            var isCorrect = updateNotes(staffConfig.staffs[currentStaffIndex].playableNotes, staffConfig.currentNoteIndex % notesPerMeasure, note);
+
             if (isCorrect) {
                 setStaffConfig({ ...staffConfig, currentNoteIndex: staffConfig.currentNoteIndex + 1 })
             }
             setNote(""); //Clear note for next note
         }
         updateVoice(staffConfig);
-    }, [note, staffConfig, clefType, level, numNotes, width, timeSignature, previousNote, numMeasures, notesPerMeasure])
+    }, [note, staffConfig, clefType, level, numNotes, width, timeSignature, previousNote, numMeasures, notesPerMeasure, initialClef])
 
     return (
         <div className="all-staff">

@@ -17,7 +17,8 @@ function App() {
         <Link to="/">Home</Link>
         <Link to="/noteTraining">Note Training</Link>
         <Link to={`/warmup/${Level.Warmup}`}>Warm up</Link>
-        <Link to ="/scales">Scales</Link>
+        <Link to="/scales">Scales</Link>
+        <Link to={`/grand/${Level.Grand}`}>Grand Staff</Link>
       </div>
       <Switch>
         <Route path="/noteTraining">
@@ -25,7 +26,7 @@ function App() {
         </Route>
         <Route path="/warmup/:level">
           <Staff
-            clef={Clef.Treble}
+            initialClef={Clef.Treble}
             width={500}
             numNotes={16}
             numMeasures={1}
@@ -34,6 +35,16 @@ function App() {
         </Route>
         <Route path="/scales">
           <ScaleTraining />
+        </Route>
+        <Route path="/grand/:level">
+          <Staff
+            initialClef={Clef.Grand}
+            width={400}
+            numNotes={4}
+            numMeasures={2}
+            rendererWidth={450}
+            rendererHeight={500}
+          />
         </Route>
         <Route path="/">
           Home
@@ -81,12 +92,12 @@ function Levels(props: { clef: Clef }) {
         </Route>
         <Route path={`${path}/:level`}>
           <Staff
-            clef={props.clef}
+            initialClef={props.clef}
             width={400}
             rendererWidth={450}
-            numNotes={4} 
+            numNotes={4}
             numMeasures={1}
-            />
+          />
         </Route>
       </Switch>
     </div>
@@ -125,29 +136,29 @@ function Scales(props: { clef: Clef }) {
           <div className="training-buttons">
             <h3>Please select a level.</h3>
             <Link to={`${url}/${Level.C_Major}`}>C Major</Link>
-            <Link to={`${url}/${Level.G_Major}`}>G Major</Link> 
+            <Link to={`${url}/${Level.G_Major}`}>G Major</Link>
             <Link to={`${url}/${Level.D_Major}`}>D Major</Link>
-            <Link to={`${url}/${Level.A_Major}`}>A Major</Link> 
-            <Link to={`${url}/${Level.E_Major}`}>E Major</Link> 
-            <Link to={`${url}/${Level.B_Major}`}>B Major</Link> 
-            <Link to={`${url}/${Level.F_Sharp_Major}`}>F# Major</Link> 
-            <Link to={`${url}/${Level.G_Flat_Major}`}>Gb Major</Link> 
-            <Link to={`${url}/${Level.D_Flat_Major}`}>Db Major</Link> 
-            <Link to={`${url}/${Level.C_Sharp_Major}`}>C# Major</Link> 
-            <Link to={`${url}/${Level.A_Flat_Major}`}>Ab Major</Link> 
-            <Link to={`${url}/${Level.E_Flat_Major}`}>Eb Major</Link> 
-            <Link to={`${url}/${Level.B_Flat_Major}`}>Bb Major</Link> 
-            <Link to={`${url}/${Level.F_Major}`}>F Major</Link> 
+            <Link to={`${url}/${Level.A_Major}`}>A Major</Link>
+            <Link to={`${url}/${Level.E_Major}`}>E Major</Link>
+            <Link to={`${url}/${Level.B_Major}`}>B Major</Link>
+            <Link to={`${url}/${Level.F_Sharp_Major}`}>F# Major</Link>
+            <Link to={`${url}/${Level.G_Flat_Major}`}>Gb Major</Link>
+            <Link to={`${url}/${Level.D_Flat_Major}`}>Db Major</Link>
+            <Link to={`${url}/${Level.C_Sharp_Major}`}>C# Major</Link>
+            <Link to={`${url}/${Level.A_Flat_Major}`}>Ab Major</Link>
+            <Link to={`${url}/${Level.E_Flat_Major}`}>Eb Major</Link>
+            <Link to={`${url}/${Level.B_Flat_Major}`}>Bb Major</Link>
+            <Link to={`${url}/${Level.F_Major}`}>F Major</Link>
           </div>
         </Route>
         <Route path={`${path}/:level`}>
           <Staff
-            clef={props.clef}
+            initialClef={props.clef}
             width={350}
             rendererWidth={800}
-            numNotes={8} 
+            numNotes={8}
             numMeasures={2}
-            />
+          />
         </Route>
       </Switch>
     </div>

@@ -7,6 +7,7 @@ export enum Level {
    Medium = "medium",
    Hard = "hard", 
    Warmup = "warmup",
+   Grand = "grand",
    C_Major = "c_major",
    G_Major = "g_major",
    D_Major = "d_major",

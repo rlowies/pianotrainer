@@ -9,6 +9,7 @@ export const VF = Vex.Flow;
 export enum Clef {
     Bass = "bass",
     Treble = "treble",
+    Grand = "grand",
 }
 
 export interface StaffConfig {
@@ -58,7 +59,7 @@ export const updateNotes = (
 }
 
 export const resetStaff = (
-    type: Clef,
+    clef: Clef,
     config: StaffConfig,
     staffWidth: number,
     numNotes: number,
@@ -68,14 +69,23 @@ export const resetStaff = (
 ): StaffConfig => {
     var context = config.staffs[0].staff.getContext();
     context.clear();
-    const measures = getMeasures(staffWidth, level, numNotes, type, numMeasures);
+    const measures = clef === Clef.Grand 
+        ? getBassAndTrebleClef(staffWidth, level, numNotes) 
+        : getMeasures(staffWidth, level, numNotes, clef, numMeasures);
 
     config.staffs.forEach((staffType: StaffMeasure, i: number) => {
         staffType.playableNotes = measures[i].playableNotes;
         staffType.staff = measures[i].staff;
 
         if (i === 0) {
-            staffType.staff.addClef(type).addTimeSignature(timeSignature);
+            staffType.staff.addClef(clef === Clef.Grand ? Clef.Treble : clef).addTimeSignature(timeSignature);
+            staffType.currentStaffNoteIndex = 0;
+        }
+
+        if (i === 1 && clef === Clef.Grand) {
+            staffType.staff.addClef(Clef.Bass).addTimeSignature(timeSignature);
+            staffType.currentStaffNoteIndex = 0;
+            renderGrandStaff(context, config.staffs);
         }
 
         staffType.staff.setContext(context).draw();
@@ -98,16 +108,48 @@ export const getMeasures = (
     let measures: StaffMeasure[] = [
         {
             staff: new VF.Stave(staffX, staffY, width),
-            playableNotes: numMeasures > 1 ? [a, b ,c, d] : allNotes
+            playableNotes: numMeasures > 1 ? [a, b, c, d] : allNotes,
+            currentStaffNoteIndex: 0,
         }
     ]
 
     if (numMeasures > 1) {
         measures.push({
             staff: new VF.Stave(staffX + width, staffY, width),
-            playableNotes: [e, f, g, h]
+            playableNotes: [e, f, g, h], 
+            currentStaffNoteIndex: 0,
         });
     }
+    return measures;
+};
+
+export const getBassAndTrebleClef = (
+    width: number,
+    level: Level,
+    numNotes: number,
+): StaffMeasure[] => {
+    let measures: StaffMeasure[] = [{
+        staff: new VF.Stave(staffX, staffY, width),
+        playableNotes: generateNotes(RANDOMIZE_LEVELS.includes(level), numNotes, Clef.Treble, level),
+        currentStaffNoteIndex: 0,
+    },
+    {
+        staff: new VF.Stave(staffX, staffY + 100, width),
+        playableNotes: generateNotes(RANDOMIZE_LEVELS.includes(level), numNotes, Clef.Bass, level),
+        currentStaffNoteIndex: 0,
+    }
+    ];
 
     return measures;
 };
+
+export const renderGrandStaff = (context: Vex.IRenderContext, staffs: StaffMeasure[]) => {
+    let topStaff = staffs[0].staff;
+    let bottomStaff = staffs[1].staff;
+    var brace = new VF.StaveConnector(topStaff, bottomStaff);
+    var lineRight = new VF.StaveConnector(topStaff, bottomStaff).setType(0);
+    var lineLeft = new VF.StaveConnector(topStaff, bottomStaff).setType(1);
+    brace.setContext(context).draw();
+    lineRight.setContext(context).draw();
+    lineLeft.setContext(context).draw();
+}
