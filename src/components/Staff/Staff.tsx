@@ -111,6 +111,21 @@ export const Staff = ({
 
                 if (isCorrect) {
                     currentStaff.currentStaffNoteIndex += 1;
+                    if(initialClef === Clef.Grand) {
+                        var trebleStaff = staffConfig.staffs[0];
+                        var bassStaff = staffConfig.staffs[1];
+                        if (trebleStaff.currentStaffNoteIndex === numNotes && bassStaff.currentStaffNoteIndex === numNotes) {
+                            const newConfig = resetStaff(initialClef === Clef.Grand ? initialClef : clefType, staffConfig, width, numNotes, level, timeSignature, numMeasures, [trebleStaff.playableNotes, bassStaff.playableNotes])
+                            const notes = [...trebleStaff.playableNotes.map(x => x.note), ...bassStaff.playableNotes.map(x => x.note)];
+                            notes.forEach(note => {
+                                note.setStyle({ fillStyle: "#000000", strokeStyle: "#000000" });
+                            });
+                            
+                            setStaffConfig(newConfig);
+                            updateVoice(staffConfig);
+                            return;
+                        }
+                    }
                 }
             }
 

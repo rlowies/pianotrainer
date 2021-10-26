@@ -66,11 +66,12 @@ export const resetStaff = (
     level: Level,
     timeSignature: string,
     numMeasures: number,
+    prevNotes?: INote[][]
 ): StaffConfig => {
     var context = config.staffs[0].staff.getContext();
     context.clear();
     const measures = clef === Clef.Grand 
-        ? getBassAndTrebleClef(staffWidth, level, numNotes) 
+        ? getBassAndTrebleClef(staffWidth, level, numNotes, prevNotes) 
         : getMeasures(staffWidth, level, numNotes, clef, numMeasures);
 
     config.staffs.forEach((staffType: StaffMeasure, i: number) => {
@@ -127,15 +128,16 @@ export const getBassAndTrebleClef = (
     width: number,
     level: Level,
     numNotes: number,
+    prevNotes?: INote[][],
 ): StaffMeasure[] => {
     let measures: StaffMeasure[] = [{
         staff: new VF.Stave(staffX, staffY, width),
-        playableNotes: generateNotes(RANDOMIZE_LEVELS.includes(level), numNotes, Clef.Treble, level),
+        playableNotes: prevNotes?.[0] ?? generateNotes(RANDOMIZE_LEVELS.includes(level), numNotes, Clef.Treble, level),
         currentStaffNoteIndex: 0,
     },
     {
         staff: new VF.Stave(staffX, staffY + 100, width),
-        playableNotes: generateNotes(RANDOMIZE_LEVELS.includes(level), numNotes, Clef.Bass, level),
+        playableNotes: prevNotes?.[1] ?? generateNotes(RANDOMIZE_LEVELS.includes(level), numNotes, Clef.Bass, level),
         currentStaffNoteIndex: 0,
     }
     ];
