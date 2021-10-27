@@ -1,13 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
 import WebMidi, { InputEventNoteon } from 'webmidi';
 import { randomSort, INote } from './../../services/NoteService/Note.service'
-import { updateNotes, updateVoice, StaffConfig, buildBassOrTrebleStaff, resetStaff, VF, Clef, buildGrandStaff, renderGrandStaff, determineStaffIndex } from './../../services/StaffService/Staff.service';
+import { updateNotes, updateVoice, buildBassOrTrebleStaff, resetStaff, VF, Clef, buildGrandStaff, renderGrandStaff, determineStaffIndex } from './../../services/StaffService/Staff.service';
 import { useParams } from 'react-router-dom';
 import './Staff.css'
 import { usePrevious } from '../../hooks/usePreviousHook';
 import { Level, LevelType } from './../../types/levelType';
 import { RESET_NOTE } from './../../types/constants';
-import { StaffMeasure } from '../../types/staffMeasure';
+import { StaffConfig } from '../../types/staffConfig';
 
 const canEnableMidi = navigator.userAgent.indexOf("Chrome") !== -1;
 
@@ -32,13 +32,12 @@ export const Staff = ({
     const [hideButtons, setHideButtons] = useState<boolean>(false);
     const [clefType, setClefType] = useState<Clef>(initialClef === Clef.Grand ? Clef.Treble : initialClef);
     let { level } = useParams<LevelType>();
-    const [staffConfig, setStaffConfig] = useState<StaffConfig>({
-        staffs: initialClef === Clef.Grand
+    const [staffConfig, setStaffConfig] = useState<StaffConfig[]>(
+        initialClef === Clef.Grand
             ? buildGrandStaff(width, level, numNotes)
             : buildBassOrTrebleStaff(width, level, numNotes, clefType, numMeasures),
-    });
+    );
     const staffRef = useRef(null);
-    var { staffs } = staffConfig;
     const notesPerMeasure = initialClef === Clef.Grand ? numNotes : numNotes / numMeasures;
     const timeSignature = `${notesPerMeasure}/4`;
     const previousNote = usePrevious(note);
@@ -48,13 +47,13 @@ export const Staff = ({
         var renderer = new VF.Renderer(staffRef.current!, VF.Renderer.Backends.SVG);
         renderer.resize(rendererWidth, rendererHeight ?? 300);
         var context = renderer.getContext();
-        staffs.forEach(({ staff }: StaffMeasure, i: number) => {
+        staffConfig.forEach(({ staff }: StaffConfig, i: number) => {
             if (i === 0) {
                 staff.addClef(clefType).addTimeSignature(timeSignature);
             }
             if (i === 1 && initialClef === Clef.Grand) {
                 staff.addClef(Clef.Bass).addTimeSignature(timeSignature);
-                renderGrandStaff(context, staffs);
+                renderGrandStaff(context, staffConfig);
             }
             staff.setContext(context).draw();
         });
@@ -98,14 +97,14 @@ export const Staff = ({
         if (note !== "" && note !== previousNote) {
             let isCorrect = false;
             const currentOctave = +note.substr(1, 1);
-            const currentStaff = staffConfig.staffs[determineStaffIndex(level, currentOctave, staffConfig.staffs)];
+            const currentStaff = staffConfig[determineStaffIndex(level, currentOctave, staffConfig)];
             isCorrect = updateNotes(currentStaff, note)
 
             if (isCorrect) {
                 currentStaff.currentStaffNoteIndex += 1;
                 if (level !== Level.Warmup) {
-                    var firstMeasure = staffConfig.staffs[0];
-                    var secondMeasure = staffConfig?.staffs?.[1];
+                    var firstMeasure = staffConfig[0];
+                    var secondMeasure = staffConfig?.[1];
                     var firstMeasureComplete = firstMeasure.currentStaffNoteIndex === notesPerMeasure;
                     if ((numMeasures === 1 && firstMeasureComplete) || (firstMeasureComplete && secondMeasure.currentStaffNoteIndex === notesPerMeasure)) {
                         const newConfig = resetStaff(initialClef === Clef.Grand ? initialClef : clefType, staffConfig, width, notesPerMeasure, level, timeSignature, numMeasures, [firstMeasure.playableNotes, secondMeasure?.playableNotes])
@@ -131,7 +130,7 @@ export const Staff = ({
             <div className="staff-buttons">
                 {!hideButtons &&
 
-                    staffConfig.staffs.map((staff: StaffMeasure) => staff.playableNotes.map((x: INote, i: number) =>
+                    staffConfig.map((staff: StaffConfig) => staff.playableNotes.map((x: INote, i: number) =>
                         <button
                             key={i}
                             onClick={() => setNote(x.name)}> Send {x.name}
