@@ -15,9 +15,9 @@ export const generateNotes = (
     clef: Clef,
     level: Level
 ): INote[] => {
-    var res: INote[] = [];
+    const res: INote[] = [];
     const VF = Vex.Flow;
-    var allNotes = setupLevel(clef, level).split(",");
+    let allNotes = setupLevel(clef, level).split(",");
 
     if (random) {
         allNotes = allNotes.sort(randomSort)

@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import WebMidi, { InputEventNoteon } from 'webmidi';
 import { /*randomSort,*/ INote } from './../../services/NoteService/Note.service'
-import { updateNotes, updateVoice, buildBassOrTrebleStaff, resetStaff, VF, Clef, buildGrandStaff, renderGrandStaff, determineStaffIndex } from './../../services/StaffService/Staff.service';
+import { updateNotes, updateVoice, buildBassOrTrebleStaff, resetStaff, VF, Clef, buildGrandStaff, renderGrandStaff, determineStaffIndex, black } from './../../services/StaffService/Staff.service';
 import { useParams } from 'react-router-dom';
 import './Staff.css'
 import { usePrevious } from '../../hooks/usePreviousHook';
@@ -44,9 +44,9 @@ export const Staff = ({
 
     //This is just initializing
     useEffect(() => {
-        var renderer = new VF.Renderer(staffRef.current!, VF.Renderer.Backends.SVG);
+        const renderer = new VF.Renderer(staffRef.current!, VF.Renderer.Backends.SVG);
         renderer.resize(rendererWidth, rendererHeight ?? 300);
-        var context = renderer.getContext();
+        const context = renderer.getContext();
         staffConfig.forEach(({ staff }: StaffConfig, i: number) => {
             if (i === 0) {
                 staff.addClef(clefType).addTimeSignature(timeSignature);
@@ -58,16 +58,15 @@ export const Staff = ({
             staff.setContext(context).draw();
         });
 
-
         if (canEnableMidi) {
             WebMidi.enable(function (err) {
                 if (err) {
                     console.log("WebMidi could not be enabled.", err);
                 } else {
-                    var midiInput = WebMidi.getInputByName("Roland Digital Piano");
+                    const midiInput = WebMidi.getInputByName("Roland Digital Piano");
                     if (midiInput) {
                         midiInput.addListener('noteon', "all", function (e: InputEventNoteon) {
-                            var noteValue = e.note.name + e.note.octave;
+                            const noteValue = e.note.name + e.note.octave;
                             setNote(noteValue);
                             console.log(`Received: "${noteValue}"`)
                         });
@@ -95,24 +94,19 @@ export const Staff = ({
             return;
         }
         if (note !== "" && note !== previousNote) {
-            let isCorrect = false;
-            const currentOctave = +note.substr(1, 1);
-            const currentStaff = staffConfig[determineStaffIndex(level, currentOctave, staffConfig)];
-            isCorrect = updateNotes(currentStaff, note)
+            const currentStaff = staffConfig[determineStaffIndex(level, +note.substr(1, 1), staffConfig)];
+            const isCorrect = updateNotes(currentStaff, note)
 
             if (isCorrect) {
                 currentStaff.currentStaffNoteIndex += 1;
-                var firstMeasure = staffConfig[0];
-                var secondMeasure = staffConfig?.[1];
-                var firstMeasureComplete = firstMeasure.currentStaffNoteIndex === notesPerMeasure;
+                const firstMeasure = staffConfig[0];
+                const secondMeasure = staffConfig?.[1];
+                const firstMeasureComplete = firstMeasure.currentStaffNoteIndex === notesPerMeasure;
                 //Reset note validation
                 if ((numMeasures === 1 && firstMeasureComplete) || (firstMeasureComplete && secondMeasure.currentStaffNoteIndex === notesPerMeasure)) {
                     const newConfig = resetStaff(initialClef === Clef.Grand ? initialClef : clefType, staffConfig, width, notesPerMeasure, level, timeSignature, numMeasures, [firstMeasure.playableNotes, secondMeasure?.playableNotes])
                     const notes = [...firstMeasure.playableNotes.map(x => x.note), ...secondMeasure?.playableNotes?.map(x => x.note) ?? []];
-                    notes.forEach(note => {
-                        note.setStyle({ fillStyle: "#000000", strokeStyle: "#000000" });
-                    });
-
+                    notes.forEach(note => note.setStyle(black));
                     setStaffConfig(newConfig);
                     updateVoice(staffConfig);
                     return;

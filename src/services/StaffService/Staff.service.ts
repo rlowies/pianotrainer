@@ -15,14 +15,16 @@ export enum Clef {
 export const staffX = 10;
 export const staffY = 100;
 
+const red = { fillStyle: "#cc0000", strokeStyle: "#cc0000" };
 const green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
+export const black = { fillStyle: "#000000", strokeStyle: "#000000" };
 
 export const updateVoice = (
     config: StaffConfig[],
 ) => {
     config.forEach(staff => {
         const notes = staff.playableNotes;
-        var voice = new VF.Voice({ num_beats: notes.length, beat_value: 4 });
+        const voice = new VF.Voice({ num_beats: notes.length, beat_value: 4 });
         voice.addTickables(notes.map(x => x.note));
         // Format and justify the notes to 400 pixels.
         new VF.Formatter().joinVoices([voice]).format([voice], config.length > 1 ? 300 : 400);
@@ -34,11 +36,10 @@ export const updateNotes = (
     staff: StaffConfig,
     note: string
 ): boolean => {
-    var red = { fillStyle: "#cc0000", strokeStyle: "#cc0000" };
     const {playableNotes, currentStaffNoteIndex} = staff;
     const numNotes = playableNotes.length;
     const currentNoteIndex = currentStaffNoteIndex % numNotes;
-    var currentNoteToPlay: INote = playableNotes[currentNoteIndex];
+    const currentNoteToPlay: INote = playableNotes[currentNoteIndex];
     const notes = playableNotes.map(x => x.note);
 
     if (notes.every((n: any) => n?.style?.fillStyle === green.fillStyle)) return true;
@@ -65,7 +66,7 @@ export const resetStaff = (
     numMeasures: number,
     prevNotes?: INote[][]
 ): StaffConfig[] => {
-    var context = config[0].staff.getContext();
+    const context = config[0].staff.getContext();
     context.clear();
     const measures = clef === Clef.Grand 
         ? buildGrandStaff(staffWidth, level, numNotes, prevNotes) 
@@ -99,10 +100,10 @@ export const buildBassOrTrebleStaff = (
     numMeasures: number,
     prevNotes?: INote[][],
 ): StaffConfig[] => {
-    let allNotes = prevNotes?.[0] ?? generateNotes(RANDOMIZE_LEVELS.includes(level), numNotes, clef, level);
-    let [a, b, c, d, e, f, g, h] = allNotes;
+    const allNotes = prevNotes?.[0] ?? generateNotes(RANDOMIZE_LEVELS.includes(level), numNotes, clef, level);
+    const [a, b, c, d, e, f, g, h] = allNotes;
 
-    let measures: StaffConfig[] = [
+    const measures: StaffConfig[] = [
         {
             staff: new VF.Stave(staffX, staffY, width),
             playableNotes: numMeasures > 1 ? [a, b, c, d] : prevNotes?.[0] ?? allNotes,
@@ -126,7 +127,7 @@ export const buildGrandStaff = (
     numNotes: number,
     prevNotes?: INote[][],
 ): StaffConfig[] => {
-    let measures: StaffConfig[] = [{
+    const measures: StaffConfig[] = [{
         staff: new VF.Stave(staffX, staffY, width),
         playableNotes: prevNotes?.[0] ?? generateNotes(RANDOMIZE_LEVELS.includes(level), numNotes, Clef.Treble, level),
         currentStaffNoteIndex: 0,
@@ -142,11 +143,11 @@ export const buildGrandStaff = (
 };
 
 export const renderGrandStaff = (context: Vex.IRenderContext, staffs: StaffConfig[]) => {
-    let topStaff = staffs[0].staff;
-    let bottomStaff = staffs[1].staff;
-    var brace = new VF.StaveConnector(topStaff, bottomStaff);
-    var lineRight = new VF.StaveConnector(topStaff, bottomStaff).setType(0);
-    var lineLeft = new VF.StaveConnector(topStaff, bottomStaff).setType(1);
+    const topStaff = staffs[0].staff;
+    const bottomStaff = staffs[1].staff;
+    const brace = new VF.StaveConnector(topStaff, bottomStaff);
+    const lineRight = new VF.StaveConnector(topStaff, bottomStaff).setType(0);
+    const lineLeft = new VF.StaveConnector(topStaff, bottomStaff).setType(1);
     brace.setContext(context).draw();
     lineRight.setContext(context).draw();
     lineLeft.setContext(context).draw();
