@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import WebMidi, { InputEventNoteon } from 'webmidi';
-import { randomSort, INote } from './../../services/NoteService/Note.service'
+import { /*randomSort,*/ INote } from './../../services/NoteService/Note.service'
 import { updateNotes, updateVoice, buildBassOrTrebleStaff, resetStaff, VF, Clef, buildGrandStaff, renderGrandStaff, determineStaffIndex } from './../../services/StaffService/Staff.service';
 import { useParams } from 'react-router-dom';
 import './Staff.css'
 import { usePrevious } from '../../hooks/usePreviousHook';
-import { Level, LevelType } from './../../types/levelType';
+import { LevelType } from './../../types/levelType';
 import { RESET_NOTE } from './../../types/constants';
 import { StaffConfig } from '../../types/staffConfig';
 
@@ -102,21 +102,20 @@ export const Staff = ({
 
             if (isCorrect) {
                 currentStaff.currentStaffNoteIndex += 1;
-                if (level !== Level.Warmup) {
-                    var firstMeasure = staffConfig[0];
-                    var secondMeasure = staffConfig?.[1];
-                    var firstMeasureComplete = firstMeasure.currentStaffNoteIndex === notesPerMeasure;
-                    if ((numMeasures === 1 && firstMeasureComplete) || (firstMeasureComplete && secondMeasure.currentStaffNoteIndex === notesPerMeasure)) {
-                        const newConfig = resetStaff(initialClef === Clef.Grand ? initialClef : clefType, staffConfig, width, notesPerMeasure, level, timeSignature, numMeasures, [firstMeasure.playableNotes, secondMeasure?.playableNotes])
-                        const notes = [...firstMeasure.playableNotes.map(x => x.note), ...secondMeasure?.playableNotes?.map(x => x.note) ?? []];
-                        notes.forEach(note => {
-                            note.setStyle({ fillStyle: "#000000", strokeStyle: "#000000" });
-                        });
+                var firstMeasure = staffConfig[0];
+                var secondMeasure = staffConfig?.[1];
+                var firstMeasureComplete = firstMeasure.currentStaffNoteIndex === notesPerMeasure;
+                //Reset note validation
+                if ((numMeasures === 1 && firstMeasureComplete) || (firstMeasureComplete && secondMeasure.currentStaffNoteIndex === notesPerMeasure)) {
+                    const newConfig = resetStaff(initialClef === Clef.Grand ? initialClef : clefType, staffConfig, width, notesPerMeasure, level, timeSignature, numMeasures, [firstMeasure.playableNotes, secondMeasure?.playableNotes])
+                    const notes = [...firstMeasure.playableNotes.map(x => x.note), ...secondMeasure?.playableNotes?.map(x => x.note) ?? []];
+                    notes.forEach(note => {
+                        note.setStyle({ fillStyle: "#000000", strokeStyle: "#000000" });
+                    });
 
-                        setStaffConfig(newConfig);
-                        updateVoice(staffConfig);
-                        return;
-                    }
+                    setStaffConfig(newConfig);
+                    updateVoice(staffConfig);
+                    return;
                 }
             }
             setNote(""); //Clear note for next note

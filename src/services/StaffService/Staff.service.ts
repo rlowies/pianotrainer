@@ -105,7 +105,7 @@ export const buildBassOrTrebleStaff = (
     let measures: StaffConfig[] = [
         {
             staff: new VF.Stave(staffX, staffY, width),
-            playableNotes: prevNotes?.[0] ?? numMeasures > 1 ? [a, b, c, d] : allNotes,
+            playableNotes: numMeasures > 1 ? [a, b, c, d] : prevNotes?.[0] ?? allNotes,
             currentStaffNoteIndex: 0,
         }
     ]
