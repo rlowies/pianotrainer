@@ -2,7 +2,7 @@ import { generateNotes, INote } from '../NoteService/Note.service';
 import Vex from 'vexflow';
 import { Level } from '../../types/levelType';
 import { StaffMeasure } from '../../types/staffMeasure';
-import { RANDOMIZE_LEVELS } from '../../types/constants';
+import { BASIC_LEVELS, RANDOMIZE_LEVELS, SCALE_LEVELS } from '../../types/constants';
 
 export const VF = Vex.Flow;
 
@@ -14,11 +14,12 @@ export enum Clef {
 
 export interface StaffConfig {
     staffs: StaffMeasure[];
-    currentNoteIndex: number;
 }
 
 export const staffX = 10;
 export const staffY = 100;
+
+const green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
 
 export const updateVoice = (
     { staffs }: StaffConfig,
@@ -34,18 +35,18 @@ export const updateVoice = (
 }
 
 export const updateNotes = (
-    playableNotes: INote[],
-    currentNoteIndex: number,
+    staff: StaffMeasure,
     note: string
 ): boolean => {
     var red = { fillStyle: "#cc0000", strokeStyle: "#cc0000" };
-    var green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
+    const {playableNotes, currentStaffNoteIndex} = staff;
+    const numNotes = playableNotes.length;
+    const currentNoteIndex = currentStaffNoteIndex % numNotes;
     var currentNoteToPlay: INote = playableNotes[currentNoteIndex];
     const notes = playableNotes.map(x => x.note);
-    //fixes bug with currentNoteToPlay.order, if another note is sent after final note.
+
     if (notes.every((n: any) => n?.style?.fillStyle === green.fillStyle)) return true;
 
-    const numNotes = playableNotes.length;
     if (currentNoteIndex < numNotes && currentNoteIndex === currentNoteToPlay.order % numNotes) {
         if (note === currentNoteToPlay.name) {
             notes[currentNoteIndex].setStyle(green);
@@ -71,8 +72,8 @@ export const resetStaff = (
     var context = config.staffs[0].staff.getContext();
     context.clear();
     const measures = clef === Clef.Grand 
-        ? getBassAndTrebleClef(staffWidth, level, numNotes, prevNotes) 
-        : getMeasures(staffWidth, level, numNotes, clef, numMeasures);
+        ? buildGrandStaff(staffWidth, level, numNotes, prevNotes) 
+        : buildBassOrTrebleStaff(staffWidth, level, numNotes, clef, numMeasures, prevNotes);
 
     config.staffs.forEach((staffType: StaffMeasure, i: number) => {
         staffType.playableNotes = measures[i].playableNotes;
@@ -80,36 +81,35 @@ export const resetStaff = (
 
         if (i === 0) {
             staffType.staff.addClef(clef === Clef.Grand ? Clef.Treble : clef).addTimeSignature(timeSignature);
-            staffType.currentStaffNoteIndex = 0;
         }
 
         if (i === 1 && clef === Clef.Grand) {
             staffType.staff.addClef(Clef.Bass).addTimeSignature(timeSignature);
-            staffType.currentStaffNoteIndex = 0;
             renderGrandStaff(context, config.staffs);
         }
 
+        staffType.currentStaffNoteIndex = 0;
         staffType.staff.setContext(context).draw();
-        config.currentNoteIndex = 0;
     });
 
     return config;
 }
 
-export const getMeasures = (
+export const buildBassOrTrebleStaff = (
     width: number,
     level: Level,
     numNotes: number,
     clef: Clef,
-    numMeasures: number
+    numMeasures: number,
+    prevNotes?: INote[][],
 ): StaffMeasure[] => {
-    let allNotes = generateNotes(RANDOMIZE_LEVELS.includes(level), numNotes, clef, level);
+    let allNotes = prevNotes?.[0] ?? generateNotes(RANDOMIZE_LEVELS.includes(level), numNotes, clef, level);
     let [a, b, c, d, e, f, g, h] = allNotes;
 
     let measures: StaffMeasure[] = [
         {
             staff: new VF.Stave(staffX, staffY, width),
-            playableNotes: numMeasures > 1 ? [a, b, c, d] : allNotes,
+            playableNotes: prevNotes?.[0] ?? numMeasures > 1 ? [a, b, c, d] : allNotes,
             currentStaffNoteIndex: 0,
         }
     ]
@@ -117,14 +117,14 @@ export const getMeasures = (
     if (numMeasures > 1) {
         measures.push({
             staff: new VF.Stave(staffX + width, staffY, width),
-            playableNotes: [e, f, g, h], 
+            playableNotes: prevNotes?.[1] ?? [e, f, g, h], 
             currentStaffNoteIndex: 0,
         });
     }
     return measures;
 };
 
-export const getBassAndTrebleClef = (
+export const buildGrandStaff = (
     width: number,
     level: Level,
     numNotes: number,
@@ -154,4 +154,12 @@ export const renderGrandStaff = (context: Vex.IRenderContext, staffs: StaffMeasu
     brace.setContext(context).draw();
     lineRight.setContext(context).draw();
     lineLeft.setContext(context).draw();
+}
+
+export const determineStaffIndex = (level: Level, currentOctave: number, staffs: StaffMeasure[]) => {
+    if (level === Level.Grand) return currentOctave >= 4 ? 0 : 1;
+    if (SCALE_LEVELS.includes(level)) return staffs.some(s => s.playableNotes.map(x => x.note).every((n: any) => n?.style?.fillStyle === green.fillStyle)) ? 1 : 0;
+    if (BASIC_LEVELS.includes(level)) return 0;
+
+    return 0;
 }

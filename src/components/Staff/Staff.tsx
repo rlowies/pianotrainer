@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import WebMidi, { InputEventNoteon } from 'webmidi';
 import { randomSort, INote } from './../../services/NoteService/Note.service'
-import { updateNotes, updateVoice, StaffConfig, getMeasures, resetStaff, VF, Clef, getBassAndTrebleClef, renderGrandStaff } from './../../services/StaffService/Staff.service';
+import { updateNotes, updateVoice, StaffConfig, buildBassOrTrebleStaff, resetStaff, VF, Clef, buildGrandStaff, renderGrandStaff, determineStaffIndex } from './../../services/StaffService/Staff.service';
 import { useParams } from 'react-router-dom';
 import './Staff.css'
 import { usePrevious } from '../../hooks/usePreviousHook';
-import { LevelType } from './../../types/levelType';
+import { Level, LevelType } from './../../types/levelType';
 import { RESET_NOTE } from './../../types/constants';
 import { StaffMeasure } from '../../types/staffMeasure';
 
@@ -34,14 +34,13 @@ export const Staff = ({
     let { level } = useParams<LevelType>();
     const [staffConfig, setStaffConfig] = useState<StaffConfig>({
         staffs: initialClef === Clef.Grand
-            ? getBassAndTrebleClef(width, level, numNotes)
-            : getMeasures(width, level, numNotes, clefType, numMeasures),
-        currentNoteIndex: 0,
+            ? buildGrandStaff(width, level, numNotes)
+            : buildBassOrTrebleStaff(width, level, numNotes, clefType, numMeasures),
     });
     const staffRef = useRef(null);
     var { staffs } = staffConfig;
-    const notesPerMeasure = numNotes / numMeasures;
-    const timeSignature = `${initialClef === Clef.Grand ? numNotes : notesPerMeasure}/4`;
+    const notesPerMeasure = initialClef === Clef.Grand ? numNotes : numNotes / numMeasures;
+    const timeSignature = `${notesPerMeasure}/4`;
     const previousNote = usePrevious(note);
 
     //This is just initializing
@@ -97,40 +96,29 @@ export const Staff = ({
             return;
         }
         if (note !== "" && note !== previousNote) {
-            let currentStaffIndex = 0;
             let isCorrect = false;
-            if (initialClef !== Clef.Grand) {
-                if (numMeasures > 1) {
-                    currentStaffIndex = staffConfig.currentNoteIndex >= notesPerMeasure ? 1 : 0;
-                }
-                isCorrect = updateNotes(staffConfig.staffs[currentStaffIndex].playableNotes, staffConfig.currentNoteIndex % notesPerMeasure, note);
-            } else {
-                const currentOctave = +note.substr(1, 1);
-                const currentStaff = staffConfig.staffs[currentOctave >= 4 ? 0 : 1];
-                isCorrect = updateNotes(currentStaff.playableNotes, currentStaff.currentStaffNoteIndex, note)
-
-                if (isCorrect) {
-                    currentStaff.currentStaffNoteIndex += 1;
-                    if(initialClef === Clef.Grand) {
-                        var trebleStaff = staffConfig.staffs[0];
-                        var bassStaff = staffConfig.staffs[1];
-                        if (trebleStaff.currentStaffNoteIndex === numNotes && bassStaff.currentStaffNoteIndex === numNotes) {
-                            const newConfig = resetStaff(initialClef === Clef.Grand ? initialClef : clefType, staffConfig, width, numNotes, level, timeSignature, numMeasures, [trebleStaff.playableNotes, bassStaff.playableNotes])
-                            const notes = [...trebleStaff.playableNotes.map(x => x.note), ...bassStaff.playableNotes.map(x => x.note)];
-                            notes.forEach(note => {
-                                note.setStyle({ fillStyle: "#000000", strokeStyle: "#000000" });
-                            });
-                            
-                            setStaffConfig(newConfig);
-                            updateVoice(staffConfig);
-                            return;
-                        }
-                    }
-                }
-            }
+            const currentOctave = +note.substr(1, 1);
+            const currentStaff = staffConfig.staffs[determineStaffIndex(level, currentOctave, staffConfig.staffs)];
+            isCorrect = updateNotes(currentStaff, note)
 
             if (isCorrect) {
-                setStaffConfig({ ...staffConfig, currentNoteIndex: staffConfig.currentNoteIndex + 1 })
+                currentStaff.currentStaffNoteIndex += 1;
+                if (level !== Level.Warmup) {
+                    var firstMeasure = staffConfig.staffs[0];
+                    var secondMeasure = staffConfig?.staffs?.[1];
+                    var firstMeasureComplete = firstMeasure.currentStaffNoteIndex === notesPerMeasure;
+                    if ((numMeasures === 1 && firstMeasureComplete) || (firstMeasureComplete && secondMeasure.currentStaffNoteIndex === notesPerMeasure)) {
+                        const newConfig = resetStaff(initialClef === Clef.Grand ? initialClef : clefType, staffConfig, width, notesPerMeasure, level, timeSignature, numMeasures, [firstMeasure.playableNotes, secondMeasure?.playableNotes])
+                        const notes = [...firstMeasure.playableNotes.map(x => x.note), ...secondMeasure?.playableNotes?.map(x => x.note) ?? []];
+                        notes.forEach(note => {
+                            note.setStyle({ fillStyle: "#000000", strokeStyle: "#000000" });
+                        });
+
+                        setStaffConfig(newConfig);
+                        updateVoice(staffConfig);
+                        return;
+                    }
+                }
             }
             setNote(""); //Clear note for next note
         }
