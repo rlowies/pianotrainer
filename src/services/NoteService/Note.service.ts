@@ -3,9 +3,13 @@ import { SCALE_LEVELS } from "../../types/constants";
 import { Level } from "../../types/levelType";
 import { Clef } from "../StaffService/Staff.service";
 
+const ASCII_a = 97;
+const ASCII_g = 103;
+
 export interface INote {
   note: Vex.Flow.StaveNote;
   name: string;
+  value: string;
   order: number;
 }
 
@@ -30,15 +34,34 @@ export const generateNotes = (random: boolean = false, count: number, clef: Clef
       noteToAdd.addAccidental(0, new VF.Accidental("b"));
     }
 
+    const noteName = currentKey.replace("/", "");
+
     res.push({
       note: noteToAdd,
-      name: currentKey.replace("/", "").toUpperCase(),
+      name: noteName.toUpperCase(),
+      value: getNoteValue(noteName).toUpperCase(),
       order: i,
     });
   }
 
   return res;
 };
+
+const getNoteValue = (noteName: string): string => {
+    let resNote;
+    if (noteName.codePointAt(1) === 98) {
+        const noteOctave = noteName.charAt(2);
+        const asciiNote = noteName.charCodeAt(0);
+        if (asciiNote === ASCII_a) {
+            resNote = `G#${noteOctave}`;
+        } else {
+            resNote = `${String.fromCharCode(asciiNote - 1)}#${noteOctave}`
+        }
+        return resNote;
+    }
+
+    return noteName;
+}
 
 export const randomSort = () => 0.5 - Math.random();
 
@@ -107,8 +130,6 @@ export const buildNoteString = (
   accidental: "#" | "b" | undefined = undefined,
   accidentalLocations: number[] | "all" = "all"
 ): string => {
-  const ASCII_a = 97;
-  const ASCII_g = 103;
   let result = "";
   const startNote = initialNote.charCodeAt(0);
   numNotes = skip ? numNotes * 2 : numNotes;

@@ -184,3 +184,17 @@ it("Should build notes for hard mode in treble clef", () => {
     "B7",
   ]);
 });
+
+it("Should build note values correctly for piano from flat to charp", () => {
+    const result = generateNotes(false, 8, Clef.Treble, Level.B_Flat_Major);
+    expect(result.map((e) => e.value)).toEqual([
+      "A#4",
+      "C5",
+      "D5",
+      "D#5",
+      "F5",
+      "G5",
+      "A5",
+      "A#5"
+    ]);
+  });
