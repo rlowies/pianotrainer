@@ -37,7 +37,7 @@ export const updateNotes = (staff: StaffConfig, note: string): boolean => {
   const currentNoteToPlay: INote = playableNotes[currentNoteIndex];
   const notes = playableNotes.map((x) => x.note);
 
-  if (notes.every((n: any) => n?.style?.fillStyle === green.fillStyle)) return true;
+  if (notes.every((n: any) => n?.style?.fillStyle === green.fillStyle)) return false;
 
   if (currentNoteIndex < numNotes && currentNoteIndex === currentNoteToPlay.order % numNotes) {
     if (note === currentNoteToPlay.name) {
