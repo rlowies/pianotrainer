@@ -177,7 +177,6 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
             setNote(RESET_NOTE);
           }}
         >
-          {" "}
           Reset
         </button>
         <button
