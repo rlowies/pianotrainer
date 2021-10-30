@@ -40,7 +40,7 @@ export const updateNotes = (staff: StaffConfig, note: string): boolean => {
   if (notes.every((n: any) => n?.style?.fillStyle === green.fillStyle)) return false;
 
   if (currentNoteIndex < numNotes && currentNoteIndex === currentNoteToPlay.order % numNotes) {
-    if (note === currentNoteToPlay.name) {
+    if (note === currentNoteToPlay.value) {
       notes[currentNoteIndex].setStyle(green);
       return true;
     } else {
