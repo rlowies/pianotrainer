@@ -2,7 +2,7 @@ import { Level } from "./levelType";
 
 export const RESET_NOTE = "C8";
 export const BASIC_LEVELS = [Level.Easy, Level.Medium, Level.Hard];
-export const RANDOMIZE_LEVELS = [...BASIC_LEVELS, Level.Grand];
+export const RANDOMIZE_LEVELS = [...BASIC_LEVELS];
 export const SCALE_LEVELS = [
   Level.C_Major,
   Level.G_Major,

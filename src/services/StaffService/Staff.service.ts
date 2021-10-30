@@ -108,35 +108,34 @@ export const buildBassOrTrebleStaff = (
 };
 
 const getNotesForLevel = (
-    level: Level,
-    numNotes: number,
-    clef: Clef,
-    numMeasures: number,
-    currentMeasure: number,
-    prevNotes?: INote[][]
-  ): INote[] => {
-    const isRandomLevel = RANDOMIZE_LEVELS.includes(level);
-    const allNotes = prevNotes?.[0] ?? generateNotes(isRandomLevel, numNotes, clef, level);
-    const half = Math.ceil(allNotes.length / 2);
-    const firstHalf = allNotes.slice(0, half);
-    const secondHalf = allNotes.slice(0, half).reverse();
-  
-    const isScaleLevel = SCALE_LEVELS.includes(level);
-    if (isScaleLevel) {
-      if (currentMeasure === 0) {
-        return generateNotes(isRandomLevel, numNotes, clef, level);
-      } else {
-        return generateNotes(isRandomLevel, numNotes, clef, level, true);
-      }
-    }
-  
-    if (currentMeasure === 0) {
-      return numMeasures > 1 ? firstHalf : prevNotes?.[0] ?? allNotes;
-    }
-  
-    return prevNotes?.[1] ?? secondHalf;
-  };
+  level: Level,
+  numNotes: number,
+  clef: Clef,
+  numMeasures: number,
+  currentMeasure: number,
+  prevNotes?: INote[][]
+): INote[] => {
+  const isRandomLevel = RANDOMIZE_LEVELS.includes(level);
+  const allNotes = prevNotes?.[0] ?? generateNotes(isRandomLevel, numNotes, clef, level);
+  const half = Math.ceil(allNotes.length / 2);
+  const firstHalf = allNotes.slice(0, half);
+  const secondHalf = allNotes.slice(0, half).reverse();
 
+  const isScaleLevel = SCALE_LEVELS.includes(level);
+  if (isScaleLevel) {
+    if (currentMeasure === 0) {
+      return generateNotes(isRandomLevel, numNotes, clef, level);
+    } else {
+      return generateNotes(isRandomLevel, numNotes, clef, level, true);
+    }
+  }
+
+  if (currentMeasure === 0) {
+    return numMeasures > 1 ? firstHalf : prevNotes?.[0] ?? allNotes;
+  }
+
+  return prevNotes?.[1] ?? secondHalf;
+};
 
 export const buildGrandStaff = (width: number, level: Level, numNotes: number, prevNotes?: INote[][]): StaffConfig[] => {
   const measures: StaffConfig[] = [
@@ -166,7 +165,10 @@ export const renderGrandStaff = (context: Vex.IRenderContext, staffs: StaffConfi
   lineLeft.setContext(context).draw();
 };
 
-export const determineStaffIndex = (level: Level, currentOctave: number, staffs: StaffConfig[]) => {
+export const determineStaffIndex = (level: Level, note: string, staffs: StaffConfig[]) => {
+  const o = note.substr(1, 1);
+  const currentOctave = o === "#" || o === "B" ? +note.substr(2, 2) : +note.substr(1, 1);
+
   if (level === Level.Grand) return currentOctave >= 4 ? 0 : 1;
   if (SCALE_LEVELS.includes(level))
     return staffs.some((s) => s.playableNotes.map((x) => x.note).every((n: any) => n?.style?.fillStyle === green.fillStyle))

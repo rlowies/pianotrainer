@@ -45,8 +45,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
   const staffRef = useRef(null);
   const timeSignature = `${notesPerMeasure}/4`;
   const previousNote = usePrevious(note);
-
-  const currentStaffIndex = determineStaffIndex(level, +note.substr(1, 1), staffConfig);
+  const currentStaffIndex = determineStaffIndex(level, note, staffConfig);
 
   //This is just initializing
   useEffect(() => {
@@ -103,11 +102,8 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
         numMeasures
       );
       setStaffConfig(newConfig);
-      updateVoice(newConfig);
-      setNote("");
-      return;
     }
-    if (note !== "" && note !== previousNote) {
+    if (note !== "" && note !== previousNote && note !== RESET_NOTE) {
       const currentStaff = staffConfig[currentStaffIndex];
       const isCorrect = updateNotes(currentStaff, note);
 
