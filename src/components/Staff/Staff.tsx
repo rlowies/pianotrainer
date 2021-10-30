@@ -129,7 +129,9 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
             level,
             timeSignature,
             numMeasures,
-            SCALE_LEVELS.includes(level) ? [firstMeasure.playableNotes.concat(secondMeasure?.playableNotes)] : [firstMeasure.playableNotes, secondMeasure?.playableNotes]
+            SCALE_LEVELS.includes(level)
+              ? [firstMeasure.playableNotes.concat(secondMeasure?.playableNotes)]
+              : [firstMeasure.playableNotes, secondMeasure?.playableNotes]
           );
           const notes = [
             ...firstMeasure.playableNotes.map((x) => x.note),
@@ -138,6 +140,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
           notes.forEach((note) => note.setStyle(black));
           setStaffConfig(newConfig);
           updateVoice(staffConfig);
+          setNote(""); //Clear note for next note
           return;
         }
       }
