@@ -1,5 +1,5 @@
 import Vex from "vexflow";
-import { SCALE_LEVELS } from "../../types/constants";
+import { RANDOMIZE_LEVELS, SCALE_LEVELS } from "../../types/constants";
 import { Level } from "../../types/levelType";
 import { Clef } from "../StaffService/Staff.service";
 
