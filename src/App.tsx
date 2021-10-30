@@ -127,7 +127,7 @@ function Scales(props: { clef: Clef }) {
           </div>
         </Route>
         <Route path={`${path}/:level`}>
-          <Staff initialClef={props.clef} width={350} rendererWidth={800} numNotes={8} numMeasures={2} />
+          <Staff initialClef={props.clef} width={350} rendererWidth={800} numNotes={16} numMeasures={2} />
         </Route>
       </Switch>
     </div>

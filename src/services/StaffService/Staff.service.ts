@@ -96,13 +96,10 @@ export const buildBassOrTrebleStaff = (
   numMeasures: number,
   prevNotes?: INote[][]
 ): StaffConfig[] => {
-  const allNotes = prevNotes?.[0] ?? generateNotes(RANDOMIZE_LEVELS.includes(level), numNotes, clef, level);
-  const [a, b, c, d, e, f, g, h] = allNotes;
-
   const measures: StaffConfig[] = [
     {
       staff: new VF.Stave(staffX, staffY, width),
-      playableNotes: numMeasures > 1 ? [a, b, c, d] : prevNotes?.[0] ?? allNotes,
+      playableNotes: getNotesForLevel(level, numNotes, clef, numMeasures, 0, prevNotes),
       currentStaffNoteIndex: 0,
     },
   ];
@@ -110,11 +107,41 @@ export const buildBassOrTrebleStaff = (
   if (numMeasures > 1) {
     measures.push({
       staff: new VF.Stave(staffX + width, staffY, width),
-      playableNotes: prevNotes?.[1] ?? [e, f, g, h],
+      playableNotes: getNotesForLevel(level, numNotes, clef, numMeasures, 1, prevNotes),
       currentStaffNoteIndex: 0,
     });
   }
   return measures;
+};
+
+const getNotesForLevel = (
+  level: Level,
+  numNotes: number,
+  clef: Clef,
+  numMeasures: number,
+  currentMeasure: number,
+  prevNotes?: INote[][]
+): INote[] => {
+    const isRandomLevel = RANDOMIZE_LEVELS.includes(level);
+  const allNotes = prevNotes?.[0] ?? generateNotes(isRandomLevel, numNotes, clef, level);
+  const half = Math.ceil(allNotes.length / 2);
+  const firstHalf = allNotes.slice(0, half);
+  const secondHalf = allNotes.slice(0, half).reverse();
+
+  const isScaleLevel = SCALE_LEVELS.includes(level);
+  if (isScaleLevel) {
+    if (currentMeasure === 0) {
+      return generateNotes(isRandomLevel, numNotes, clef, level);
+    } else {
+      return generateNotes(isRandomLevel, numNotes, clef, level, true);
+    }
+  }
+
+  if (currentMeasure === 0) {
+    return numMeasures > 1 ? firstHalf : prevNotes?.[0] ?? allNotes;
+  }
+
+  return prevNotes?.[1] ?? secondHalf;
 };
 
 export const buildGrandStaff = (width: number, level: Level, numNotes: number, prevNotes?: INote[][]): StaffConfig[] => {

@@ -13,10 +13,10 @@ export interface INote {
   order: number;
 }
 
-export const generateNotes = (random: boolean = false, count: number, clef: Clef, level: Level): INote[] => {
+export const generateNotes = (random: boolean = false, count: number, clef: Clef, level: Level, reverse: boolean = false): INote[] => {
   const res: INote[] = [];
   const VF = Vex.Flow;
-  let allNotes = setupLevel(clef, level).split(",");
+  let allNotes = setupLevel(clef, level, reverse).split(",");
 
   if (random) {
     allNotes = allNotes.sort(randomSort);
@@ -69,13 +69,13 @@ const clefIsTreble = (clef: Clef) => {
   return clef === Clef.Treble;
 };
 
-const setupLevel = (clef: Clef, level: Level): string => {
+const setupLevel = (clef: Clef, level: Level, reverse: boolean = false): string => {
   const isTrebleClef = clefIsTreble(clef);
 
   if (level === Level.Grand) return isTrebleClef ? buildNoteString(8, "c", 4, false) : buildNoteString(8, "c", 2, false);
   if (level === Level.Warmup) return isTrebleClef ? warmUpTreble : warmUpBass;
 
-  if (SCALE_LEVELS.includes(level)) return scaleLevel(level, isTrebleClef);
+  if (SCALE_LEVELS.includes(level)) return scaleLevel(level, isTrebleClef, reverse);
 
   if (level === Level.Easy) {
     return isTrebleClef ? trebleClefEasy : bassClefEasy;
@@ -86,39 +86,39 @@ const setupLevel = (clef: Clef, level: Level): string => {
   }
 };
 
-const scaleLevel = (level: Level, isTrebleClef: boolean): string => {
+const scaleLevel = (level: Level, isTrebleClef: boolean, reverse: boolean = false): string => {
   const octave = isTrebleClef ? 4 : 2;
   switch (level) {
     case Level.C_Major:
-      return buildNoteString(8, "c", octave, false);
+      return buildNoteString(8, "c", octave, false, undefined, undefined, reverse);
     case Level.G_Major:
-      return buildNoteString(8, "g", octave, false, "#", [7]);
+      return buildNoteString(8, "g", octave, false, "#", [7], reverse);
     case Level.D_Major:
-      return buildNoteString(8, "d", octave, false, "#", [3, 7]);
+      return buildNoteString(8, "d", octave, false, "#", [3, 7], reverse);
     case Level.A_Major:
-      return buildNoteString(8, "a", octave, false, "#", [3, 6, 7]);
+      return buildNoteString(8, "a", octave, false, "#", [3, 6, 7], reverse);
     case Level.E_Major:
-      return buildNoteString(8, "e", octave, false, "#", [2, 3, 6, 7]);
+      return buildNoteString(8, "e", octave, false, "#", [2, 3, 6, 7], reverse);
     case Level.B_Major:
-      return buildNoteString(8, "b", octave, false, "#", [2, 3, 5, 6, 7]);
+      return buildNoteString(8, "b", octave, false, "#", [2, 3, 5, 6, 7], reverse);
     case Level.F_Sharp_Major:
-      return buildNoteString(8, "f", octave, false, "#", [1, 2, 3, 5, 6, 7, 8]);
+      return buildNoteString(8, "f", octave, false, "#", [1, 2, 3, 5, 6, 7, 8], reverse);
     case Level.G_Flat_Major:
-      return buildNoteString(8, "g", octave, false, "b", [1, 2, 3, 4, 5, 6, 8]);
+      return buildNoteString(8, "g", octave, false, "b", [1, 2, 3, 4, 5, 6, 8], reverse);
     case Level.D_Flat_Major:
-      return buildNoteString(8, "d", octave, false, "b", [1, 2, 4, 5, 6, 8]);
+      return buildNoteString(8, "d", octave, false, "b", [1, 2, 4, 5, 6, 8], reverse);
     case Level.C_Sharp_Major:
-      return buildNoteString(8, "c", octave, false, "#", "all");
+      return buildNoteString(8, "c", octave, false, "#", "all", reverse);
     case Level.A_Flat_Major:
-      return buildNoteString(8, "a", octave, false, "b", [1, 2, 4, 5, 8]);
+      return buildNoteString(8, "a", octave, false, "b", [1, 2, 4, 5, 8], reverse);
     case Level.E_Flat_Major:
-      return buildNoteString(8, "e", octave, false, "b", [1, 4, 5, 8]);
+      return buildNoteString(8, "e", octave, false, "b", [1, 4, 5, 8], reverse);
     case Level.B_Flat_Major:
-      return buildNoteString(8, "b", octave, false, "b", [1, 4, 8]);
+      return buildNoteString(8, "b", octave, false, "b", [1, 4, 8], reverse);
     case Level.F_Major:
-      return buildNoteString(8, "f", octave, false, "b", [4]);
+      return buildNoteString(8, "f", octave, false, "b", [4], reverse);
     default:
-      return buildNoteString(8, "c", octave, false);
+      return buildNoteString(8, "c", octave, false, undefined, undefined, reverse);
   }
 };
 
@@ -128,7 +128,8 @@ export const buildNoteString = (
   octave: number,
   skip: boolean = false,
   accidental: "#" | "b" | undefined = undefined,
-  accidentalLocations: number[] | "all" = "all"
+  accidentalLocations: number[] | "all" = "all",
+  reverse: boolean = false,
 ): string => {
   let result = "";
   const startNote = initialNote.charCodeAt(0);
@@ -178,7 +179,7 @@ export const buildNoteString = (
     result = newResult;
   }
 
-  return result;
+  return reverse ? result.split(",").reverse().join(",") : result;
 };
 
 const bassClefInLines = buildNoteString(10, "g", 2, true);

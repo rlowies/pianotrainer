@@ -17,7 +17,7 @@ import { useParams } from "react-router-dom";
 import "./Staff.css";
 import { usePrevious } from "../../hooks/usePreviousHook";
 import { LevelType } from "./../../types/levelType";
-import { RESET_NOTE } from "./../../types/constants";
+import { RESET_NOTE, SCALE_LEVELS } from "./../../types/constants";
 import { StaffConfig } from "../../types/staffConfig";
 
 const canEnableMidi = navigator.userAgent.indexOf("Chrome") !== -1;
@@ -36,15 +36,17 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
   const [hideButtons, setHideButtons] = useState<boolean>(false);
   const [clefType, setClefType] = useState<Clef>(initialClef === Clef.Grand ? Clef.Treble : initialClef);
   let { level } = useParams<LevelType>();
+  const notesPerMeasure = initialClef === Clef.Grand ? numNotes : numNotes / numMeasures;
   const [staffConfig, setStaffConfig] = useState<StaffConfig[]>(
     initialClef === Clef.Grand
       ? buildGrandStaff(width, level, numNotes)
-      : buildBassOrTrebleStaff(width, level, numNotes, clefType, numMeasures)
+      : buildBassOrTrebleStaff(width, level, notesPerMeasure, clefType, numMeasures)
   );
   const staffRef = useRef(null);
-  const notesPerMeasure = initialClef === Clef.Grand ? numNotes : numNotes / numMeasures;
   const timeSignature = `${notesPerMeasure}/4`;
   const previousNote = usePrevious(note);
+
+  const currentStaffIndex = determineStaffIndex(level, +note.substr(1, 1), staffConfig);
 
   //This is just initializing
   useEffect(() => {
@@ -95,7 +97,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
         initialClef === Clef.Grand ? initialClef : clefType,
         staffConfig,
         width,
-        numNotes,
+        notesPerMeasure,
         level,
         timeSignature,
         numMeasures
@@ -106,7 +108,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
       return;
     }
     if (note !== "" && note !== previousNote) {
-      const currentStaff = staffConfig[determineStaffIndex(level, +note.substr(1, 1), staffConfig)];
+      const currentStaff = staffConfig[currentStaffIndex];
       const isCorrect = updateNotes(currentStaff, note);
 
       if (isCorrect) {
@@ -127,7 +129,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
             level,
             timeSignature,
             numMeasures,
-            [firstMeasure.playableNotes, secondMeasure?.playableNotes]
+            SCALE_LEVELS.includes(level) ? [firstMeasure.playableNotes.concat(secondMeasure?.playableNotes)] : [firstMeasure.playableNotes, secondMeasure?.playableNotes]
           );
           const notes = [
             ...firstMeasure.playableNotes.map((x) => x.note),
@@ -154,6 +156,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
     numMeasures,
     notesPerMeasure,
     initialClef,
+    currentStaffIndex,
   ]);
 
   return (
