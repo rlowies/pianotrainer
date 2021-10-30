@@ -1,14 +1,8 @@
-import './App.css';
-import Staff from './components/Staff/Staff';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useRouteMatch
-} from 'react-router-dom';
-import { Clef } from './services/StaffService/Staff.service';
-import { Level } from './types/levelType';
+import "./App.css";
+import Staff from "./components/Staff/Staff";
+import { BrowserRouter as Router, Switch, Route, Link, useRouteMatch } from "react-router-dom";
+import { Clef } from "./services/StaffService/Staff.service";
+import { Level } from "./types/levelType";
 
 function App() {
   return (
@@ -24,29 +18,20 @@ function App() {
         <Route path="/noteTraining">
           <NoteTraining />
         </Route>
-        <Route path="/warmup/:level" component={() => <Staff
-          initialClef={Clef.Treble}
-          width={500}
-          numNotes={16}
-          numMeasures={1}
-          rendererWidth={550}
-        />}>
-        </Route>
+        <Route
+          path="/warmup/:level"
+          component={() => <Staff initialClef={Clef.Treble} width={500} numNotes={16} numMeasures={1} rendererWidth={550} />}
+        ></Route>
         <Route path="/scales">
           <ScaleTraining />
         </Route>
-        <Route path="/grand/:level" component={() => <Staff
-          initialClef={Clef.Grand}
-          width={400}
-          numNotes={4}
-          numMeasures={2}
-          rendererWidth={450}
-          rendererHeight={500}
-        />}>
-        </Route>
-        <Route path="/">
-          Home
-        </Route>
+        <Route
+          path="/grand/:level"
+          component={() => (
+            <Staff initialClef={Clef.Grand} width={400} numNotes={4} numMeasures={2} rendererWidth={450} rendererHeight={500} />
+          )}
+        ></Route>
+        <Route path="/">Home</Route>
       </Switch>
     </Router>
   );
@@ -71,8 +56,7 @@ const NoteTraining = () => {
       </Switch>
     </Router>
   );
-
-}
+};
 
 function Levels(props: { clef: Clef }) {
   let { path, url } = useRouteMatch();
@@ -89,13 +73,7 @@ function Levels(props: { clef: Clef }) {
           </div>
         </Route>
         <Route path={`${path}/:level`}>
-          <Staff
-            initialClef={props.clef}
-            width={400}
-            rendererWidth={450}
-            numNotes={4}
-            numMeasures={1}
-          />
+          <Staff initialClef={props.clef} width={400} rendererWidth={450} numNotes={4} numMeasures={1} />
         </Route>
       </Switch>
     </div>
@@ -121,8 +99,7 @@ const ScaleTraining = () => {
       </Switch>
     </Router>
   );
-
-}
+};
 
 function Scales(props: { clef: Clef }) {
   let { path, url } = useRouteMatch();
@@ -150,13 +127,7 @@ function Scales(props: { clef: Clef }) {
           </div>
         </Route>
         <Route path={`${path}/:level`}>
-          <Staff
-            initialClef={props.clef}
-            width={350}
-            rendererWidth={800}
-            numNotes={8}
-            numMeasures={2}
-          />
+          <Staff initialClef={props.clef} width={350} rendererWidth={800} numNotes={8} numMeasures={2} />
         </Route>
       </Switch>
     </div>

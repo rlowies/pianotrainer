@@ -1,36 +1,36 @@
 .navbar {
-    display: flex;
-    flex-direction: row;
-    background-color: blue;
+  display: flex;
+  flex-direction: row;
+  background-color: blue;
 }
 
 .navbar > a {
-    text-decoration: none;
-    margin-right: 10px;
-    padding: 10px;
-    background-color: black;
-    color: white;
+  text-decoration: none;
+  margin-right: 10px;
+  padding: 10px;
+  background-color: black;
+  color: white;
 }
 
 .training-buttons {
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
 }
 
 .training-buttons > a {
-    text-decoration: none;
-    padding: 10px;
-    margin-top: 10px;
-    background-color: orange;
-    color: white;
-    font-family: 'Franklin Gothic Medium';
-    font-size: larger;
-    border: 1px solid black;
-    width: 50%;
+  text-decoration: none;
+  padding: 10px;
+  margin-top: 10px;
+  background-color: orange;
+  color: white;
+  font-family: "Franklin Gothic Medium";
+  font-size: larger;
+  border: 1px solid black;
+  width: 50%;
 }
 
-.training-buttons > a:focus { 
-    border: 2px solid red;
+.training-buttons > a:focus {
+  border: 2px solid red;
 }
