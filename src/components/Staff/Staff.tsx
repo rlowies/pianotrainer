@@ -139,9 +139,6 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
           ];
           notes.forEach((note) => note.setStyle(black));
           setStaffConfig(newConfig);
-          updateVoice(staffConfig);
-          setNote(""); //Clear note for next note
-          return;
         }
       }
       setNote(""); //Clear note for next note
