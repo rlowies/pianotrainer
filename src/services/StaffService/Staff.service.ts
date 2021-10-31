@@ -70,13 +70,14 @@ export const resetStaff = (
   level: Level,
   timeSignature: string,
   numMeasures: number,
+  chord: Chord,
   prevNotes?: INote[][]
 ): StaffConfig[] => {
   const context = config[0].staff.getContext();
   context.clear();
   const measures =
     clef === Clef.Grand
-      ? buildGrandStaff(staffWidth, level, numNotes, undefined, prevNotes)
+      ? buildGrandStaff(staffWidth, level, numNotes, chord, prevNotes)
       : buildBassOrTrebleStaff(staffWidth, level, numNotes, clef, numMeasures, prevNotes);
 
   config.forEach((staffType: StaffConfig, i: number) => {

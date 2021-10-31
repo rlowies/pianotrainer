@@ -99,7 +99,8 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
         notesPerMeasure,
         level,
         timeSignature,
-        numMeasures
+        numMeasures,
+        chord,
       );
       setStaffConfig(newConfig);
     }
@@ -130,6 +131,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
             level,
             timeSignature,
             numMeasures,
+            chord,
             SCALE_LEVELS.includes(level)
               ? [firstMeasure.playableNotes.concat(secondMeasure?.playableNotes)]
               : [firstMeasure.playableNotes, secondMeasure?.playableNotes]
@@ -158,6 +160,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
     notesPerMeasure,
     initialClef,
     currentStaffIndex,
+    chord
   ]);
 
   return (
