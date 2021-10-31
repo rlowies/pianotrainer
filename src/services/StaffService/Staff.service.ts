@@ -17,7 +17,7 @@ export const staffY = 100;
 
 const red = { fillStyle: "#cc0000", strokeStyle: "#cc0000" };
 const green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
-export const black = { fillStyle: "#000000", strokeStyle: "#000000" };
+const black = { fillStyle: "#000000", strokeStyle: "#000000" };
 
 export const updateVoice = (config: StaffConfig[], level: Level, clef: Clef) => {
   config.forEach((staff) => {
@@ -149,7 +149,13 @@ const getNotesForLevel = (
   return prevNotes?.[1] ?? secondHalf;
 };
 
-export const buildGrandStaff = (width: number, level: Level, numNotes: number, chord?: Chord, prevNotes?: INote[][]): StaffConfig[] => {
+export const buildGrandStaff = (
+  width: number,
+  level: Level,
+  numNotes: number,
+  chord?: Chord,
+  prevNotes?: INote[][]
+): StaffConfig[] => {
   const isRandomLevel = RANDOMIZE_LEVELS.includes(level);
   const measures: StaffConfig[] = [
     {
@@ -220,4 +226,32 @@ const getGrandStaffIndex = (octave: number, staffs: StaffConfig[]): number => {
       ? 3
       : 2;
   }
+};
+
+export const resetNoteValidation = (
+  staffConfig: StaffConfig[],
+  notesPerMeasure: number,
+  initialClef: Clef,
+  clefType: Clef,
+  width: number,
+  level: Level,
+  timeSignature: string,
+  numMeasures: number,
+  chord: Chord
+): StaffConfig[] => {
+    const newConfig = resetStaff(
+      initialClef === Clef.Grand ? initialClef : clefType,
+      staffConfig,
+      width,
+      notesPerMeasure,
+      level,
+      timeSignature,
+      numMeasures,
+      chord,
+      SCALE_LEVELS.includes(level) ? [] : [...staffConfig.map((staff) => staff.playableNotes)]
+    );
+    const allNotes = staffConfig.map((measure) => measure.playableNotes.map((x) => x.note));
+    allNotes.forEach((staff) => staff.forEach((note) => note.setStyle(black)));
+    return newConfig;
+
 };

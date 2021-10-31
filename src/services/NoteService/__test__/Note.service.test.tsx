@@ -212,10 +212,3 @@ it("Should build note values correctly for piano from flat to sharp", () => {
       "C#5"
     ]);
   });
-
-  // it("Should build note values correctly for flats to basic", () => {
-  //   const result = generateNotes(false, 8, Clef.Treble, Level.D_Flat_Major);
-  //   expect(result.map((e) => e.value)).toEqual([
-  //     ""
-  //   ]);
-  // });

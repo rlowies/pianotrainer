@@ -11,13 +11,13 @@ import {
   buildGrandStaff,
   renderGrandStaff,
   determineStaffIndex,
-  black,
+  resetNoteValidation,
 } from "./../../services/StaffService/Staff.service";
 import { useParams } from "react-router-dom";
 import "./Staff.css";
 import { usePrevious } from "../../hooks/usePreviousHook";
 import { LevelType } from "./../../types/levelType";
-import { RESET_NOTE, SCALE_LEVELS } from "./../../types/constants";
+import { RESET_NOTE } from "./../../types/constants";
 import { StaffConfig } from "../../types/staffConfig";
 
 const canEnableMidi = navigator.userAgent.indexOf("Chrome") !== -1;
@@ -100,7 +100,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
         level,
         timeSignature,
         numMeasures,
-        chord,
+        chord
       );
       setStaffConfig(newConfig);
     }
@@ -111,22 +111,19 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
       if (isCorrect) {
         currentStaff.currentStaffNoteIndex += 1;
         //Reset note validation
-        if (staffConfig.every(measure => measure.currentStaffNoteIndex === notesPerMeasure)) {
-          const newConfig = resetStaff(
-            initialClef === Clef.Grand ? initialClef : clefType,
+        if (staffConfig.every((measure) => measure.currentStaffNoteIndex === notesPerMeasure)) {
+          const newConfig = resetNoteValidation(
             staffConfig,
-            width,
             notesPerMeasure,
+            initialClef,
+            clefType,
+            width,
             level,
             timeSignature,
             numMeasures,
-            chord,
-            SCALE_LEVELS.includes(level)
-              ? []
-              : [...staffConfig.map(staff => staff.playableNotes)]
+            chord
           );
-          const allNotes = staffConfig.map(measure => measure.playableNotes.map(x => x.note));
-          allNotes.forEach((staff) => staff.forEach(note => note.setStyle(black)));
+
           setStaffConfig(newConfig);
         }
       }
@@ -146,7 +143,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
     notesPerMeasure,
     initialClef,
     currentStaffIndex,
-    chord
+    chord,
   ]);
 
   return (
