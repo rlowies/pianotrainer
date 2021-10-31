@@ -35,17 +35,17 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
   const [note, setNote] = useState<string>("");
   const [hideButtons, setHideButtons] = useState<boolean>(false);
   const [clefType, setClefType] = useState<Clef>(initialClef === Clef.Grand ? Clef.Treble : initialClef);
-  let { level } = useParams<LevelType>();
+  let { level, chord } = useParams<LevelType>();
   const notesPerMeasure = initialClef === Clef.Grand ? numNotes : numNotes / numMeasures;
   const [staffConfig, setStaffConfig] = useState<StaffConfig[]>(
     initialClef === Clef.Grand
-      ? buildGrandStaff(width, level, numNotes)
+      ? buildGrandStaff(width, level, numNotes, chord)
       : buildBassOrTrebleStaff(width, level, notesPerMeasure, clefType, numMeasures)
   );
   const staffRef = useRef(null);
   const timeSignature = `${notesPerMeasure}/4`;
   const previousNote = usePrevious(note);
-  const currentStaffIndex = determineStaffIndex(level, note, staffConfig);
+  const currentStaffIndex = determineStaffIndex(level, note, staffConfig, initialClef);
 
   //This is just initializing
   useEffect(() => {
@@ -56,7 +56,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
       if (i === 0) {
         staff.addClef(clefType).addTimeSignature(timeSignature);
       }
-      if (i === 1 && initialClef === Clef.Grand) {
+      if (i === 2 && initialClef === Clef.Grand) {
         staff.addClef(Clef.Bass).addTimeSignature(timeSignature);
         renderGrandStaff(context, staffConfig);
       }
@@ -111,11 +111,16 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
         currentStaff.currentStaffNoteIndex += 1;
         const firstMeasure = staffConfig[0];
         const secondMeasure = staffConfig?.[1];
+        const thirdMeasure = staffConfig?.[2];
+        const fourthMeasure = staffConfig?.[3];
         const firstMeasureComplete = firstMeasure.currentStaffNoteIndex === notesPerMeasure;
+        const secondMeasureComplete = secondMeasure.currentStaffNoteIndex === notesPerMeasure;
+        const thirdMeasureComplete = thirdMeasure.currentStaffNoteIndex === notesPerMeasure;
+        const fourthMeasureComplete = fourthMeasure.currentStaffNoteIndex === notesPerMeasure;
         //Reset note validation
         if (
           (numMeasures === 1 && firstMeasureComplete) ||
-          (firstMeasureComplete && secondMeasure.currentStaffNoteIndex === notesPerMeasure)
+          (firstMeasureComplete && secondMeasureComplete && thirdMeasureComplete && fourthMeasureComplete)
         ) {
           const newConfig = resetStaff(
             initialClef === Clef.Grand ? initialClef : clefType,
@@ -139,7 +144,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
       }
       setNote(""); //Clear note for next note
     }
-    updateVoice(staffConfig);
+    updateVoice(staffConfig, level, initialClef);
   }, [
     note,
     staffConfig,

@@ -46,11 +46,11 @@ describe("When building Grand staff", () => {
   });
 
   it("Should correctly build previous notes", () => {
-    const trebleNotes = generateNotes(false, notesPerMeasure, Clef.Treble, level, false);
-    const bassNotes = generateNotes(false, notesPerMeasure, Clef.Bass, level, false);
+    const trebleNotes = generateNotes(false, notesPerMeasure, Clef.Treble, level, undefined, false);
+    const bassNotes = generateNotes(false, notesPerMeasure, Clef.Bass, level, undefined, false);
     const prevNotes: INote[][] = [trebleNotes, bassNotes];
 
-    const staffConfig = buildGrandStaff(width, level, notesPerMeasure, prevNotes);
+    const staffConfig = buildGrandStaff(width, level, notesPerMeasure, undefined, prevNotes);
 
     const firstMeasure = staffConfig[0].playableNotes.map((x) => x.name);
     const secondMeasure = staffConfig[1].playableNotes.map((x) => x.name);

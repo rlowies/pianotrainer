@@ -1,6 +1,6 @@
 import Vex from "vexflow";
 import { SCALE_LEVELS } from "../../types/constants";
-import { Level } from "../../types/levelType";
+import { Chord, Level } from "../../types/levelType";
 import { Clef } from "../StaffService/Staff.service";
 
 const ASCII_a = 97;
@@ -13,10 +13,17 @@ export interface INote {
   order: number;
 }
 
-export const generateNotes = (random: boolean = false, count: number, clef: Clef, level: Level, reverse: boolean = false): INote[] => {
+export const generateNotes = (
+  random: boolean = false,
+  count: number,
+  clef: Clef,
+  level: Level,
+  chord?: Chord,
+  reverse: boolean = false
+): INote[] => {
   const res: INote[] = [];
   const VF = Vex.Flow;
-  let allNotes = setupLevel(clef, level, reverse).split(",");
+  let allNotes = setupLevel(clef, level, chord!, reverse).split(",");
 
   if (random) {
     allNotes = allNotes.sort(randomSort);
@@ -48,20 +55,20 @@ export const generateNotes = (random: boolean = false, count: number, clef: Clef
 };
 
 const getNoteValue = (noteName: string): string => {
-    let resNote;
-    if (noteName.codePointAt(1) === 98) {
-        const noteOctave = noteName.charAt(2);
-        const asciiNote = noteName.charCodeAt(0);
-        if (asciiNote === ASCII_a) {
-            resNote = `G#${noteOctave}`;
-        } else {
-            resNote = `${String.fromCharCode(asciiNote - 1)}#${noteOctave}`
-        }
-        return resNote;
+  let resNote;
+  if (noteName.codePointAt(1) === 98) {
+    const noteOctave = noteName.charAt(2);
+    const asciiNote = noteName.charCodeAt(0);
+    if (asciiNote === ASCII_a) {
+      resNote = `G#${noteOctave}`;
+    } else {
+      resNote = `${String.fromCharCode(asciiNote - 1)}#${noteOctave}`;
     }
+    return resNote;
+  }
 
-    return noteName;
-}
+  return noteName;
+};
 
 export const randomSort = () => 0.5 - Math.random();
 
@@ -69,12 +76,10 @@ const clefIsTreble = (clef: Clef) => {
   return clef === Clef.Treble;
 };
 
-const setupLevel = (clef: Clef, level: Level, reverse: boolean = false): string => {
+const setupLevel = (clef: Clef, level: Level, chord: Chord, reverse: boolean = false): string => {
   const isTrebleClef = clefIsTreble(clef);
 
-  //Treble: e f# g# a (e major)
-  //Bass: c d e f (c major)
-  if (level === Level.Grand) return isTrebleClef ? buildNoteString(4, "e", 4, false, "#", [2, 3]) : buildNoteString(4, "c", 2, false);
+  if (level === Level.Chord) return grandLevel(isTrebleClef, chord, reverse);
   if (level === Level.Warmup) return isTrebleClef ? warmUpTreble : warmUpBass;
 
   if (SCALE_LEVELS.includes(level)) return scaleLevel(level, isTrebleClef, reverse);
@@ -85,6 +90,18 @@ const setupLevel = (clef: Clef, level: Level, reverse: boolean = false): string 
     return isTrebleClef ? trebleClefMedium : bassClefMedium;
   } else {
     return isTrebleClef ? trebleClefHard : bassClefHard;
+  }
+};
+
+const grandLevel = (isTrebleClef: boolean, chord: Chord, reverse: boolean) => {
+  const CLEVEL = isTrebleClef
+    ? scaleLevel(Level.E_Major, isTrebleClef, reverse)
+    : scaleLevel(Level.C_Major, isTrebleClef, reverse);
+  switch (chord) {
+    case Chord.C_Major:
+      return CLEVEL;
+    default:
+      return CLEVEL;
   }
 };
 
@@ -131,7 +148,7 @@ export const buildNoteString = (
   skip: boolean = false,
   accidental: "#" | "b" | undefined = undefined,
   accidentalLocations: number[] | "all" = "all",
-  reverse: boolean = false,
+  reverse: boolean = false
 ): string => {
   let result = "";
   const startNote = initialNote.charCodeAt(0);
