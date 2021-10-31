@@ -185,7 +185,7 @@ it("Should build notes for hard mode in treble clef", () => {
   ]);
 });
 
-it("Should build note values correctly for piano from flat to charp", () => {
+it("Should build note values correctly for piano from flat to sharp", () => {
     const result = generateNotes(false, 8, Clef.Treble, Level.B_Flat_Major);
     expect(result.map((e) => e.value)).toEqual([
       "A#4",
@@ -198,3 +198,24 @@ it("Should build note values correctly for piano from flat to charp", () => {
       "A#5"
     ]);
   });
+
+  it("Should build note values correctly for sharp to flat", () => {
+    const result = generateNotes(false, 8, Clef.Treble, Level.C_Sharp_Major);
+    expect(result.map((e) => e.value)).toEqual([
+      "C#4",
+      "D#4",
+      "F4",
+      "F#4",
+      "G#4",
+      "A#4",
+      "C5",
+      "C#5"
+    ]);
+  });
+
+  // it("Should build note values correctly for flats to basic", () => {
+  //   const result = generateNotes(false, 8, Clef.Treble, Level.D_Flat_Major);
+  //   expect(result.map((e) => e.value)).toEqual([
+  //     ""
+  //   ]);
+  // });

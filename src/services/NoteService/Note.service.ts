@@ -57,18 +57,19 @@ export const generateNotes = (
 const getNoteValue = (noteName: string): string => {
   let resNote;
   const noteOctave = noteName.charAt(2);
+  const noteWithoutOctave = noteName.substr(0, 2);
 
   if (noteName.codePointAt(1) === 98) {
-    const noteWithoutOctave = noteName.substr(0, 2);
-    if (noteWithoutOctave === "fb") {
-      resNote = `E${noteOctave}`;
-      return resNote;
-    }
+    //for non major scales
+    // if (noteWithoutOctave === "fb") {
+    //   resNote = `E${noteOctave}`;
+    //   return resNote;
+    // }
 
-    if (noteWithoutOctave === "cb") {
-      resNote = `B${noteOctave}`;
-      return resNote;
-    }
+    // if (noteWithoutOctave === "cb") {
+    //   resNote = `B${noteOctave}`;
+    //   return resNote;
+    // }
 
     const asciiNote = noteName.charCodeAt(0);
     if (asciiNote === ASCII_a) {
@@ -79,14 +80,13 @@ const getNoteValue = (noteName: string): string => {
     return resNote;
   } else if (noteName.codePointAt(1) === 35) {
     //#
-    const noteWithoutOctave = noteName.substr(0, 2);
     if (noteWithoutOctave === "e#") {
       resNote = `F${noteOctave}`;
       return resNote;
     }
 
     if (noteWithoutOctave === "b#") {
-      resNote = `C${noteOctave}`;
+      resNote = `C${+noteOctave + 1}`;
       return resNote;
     }
   }
