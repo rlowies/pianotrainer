@@ -110,19 +110,8 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
 
       if (isCorrect) {
         currentStaff.currentStaffNoteIndex += 1;
-        const firstMeasure = staffConfig[0];
-        const secondMeasure = staffConfig?.[1];
-        const thirdMeasure = staffConfig?.[2];
-        const fourthMeasure = staffConfig?.[3];
-        const firstMeasureComplete = firstMeasure.currentStaffNoteIndex === notesPerMeasure;
-        const secondMeasureComplete = secondMeasure.currentStaffNoteIndex === notesPerMeasure;
-        const thirdMeasureComplete = thirdMeasure.currentStaffNoteIndex === notesPerMeasure;
-        const fourthMeasureComplete = fourthMeasure.currentStaffNoteIndex === notesPerMeasure;
         //Reset note validation
-        if (
-          (numMeasures === 1 && firstMeasureComplete) ||
-          (firstMeasureComplete && secondMeasureComplete && thirdMeasureComplete && fourthMeasureComplete)
-        ) {
+        if (staffConfig.every(measure => measure.currentStaffNoteIndex === notesPerMeasure)) {
           const newConfig = resetStaff(
             initialClef === Clef.Grand ? initialClef : clefType,
             staffConfig,
@@ -133,14 +122,11 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
             numMeasures,
             chord,
             SCALE_LEVELS.includes(level)
-              ? [firstMeasure.playableNotes.concat(secondMeasure?.playableNotes)]
-              : [firstMeasure.playableNotes, secondMeasure?.playableNotes]
+              ? []
+              : [...staffConfig.map(staff => staff.playableNotes)]
           );
-          const notes = [
-            ...firstMeasure.playableNotes.map((x) => x.note),
-            ...(secondMeasure?.playableNotes?.map((x) => x.note) ?? []),
-          ];
-          notes.forEach((note) => note.setStyle(black));
+          const allNotes = staffConfig.map(measure => measure.playableNotes.map(x => x.note));
+          allNotes.forEach((staff) => staff.forEach(note => note.setStyle(black)));
           setStaffConfig(newConfig);
         }
       }

@@ -59,8 +59,6 @@ const NoteTraining = () => {
 
 const ChordTraining = () => {
   let { url, path } = useRouteMatch();
-  console.log(url);
-  console.log(path);
   return (
     <Switch>
       <Route
