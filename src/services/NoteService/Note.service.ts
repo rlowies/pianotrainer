@@ -94,14 +94,62 @@ const setupLevel = (clef: Clef, level: Level, chord: Chord, reverse: boolean = f
 };
 
 const grandLevel = (isTrebleClef: boolean, chord: Chord, reverse: boolean) => {
-  const CLEVEL = isTrebleClef
+  const C_LEVEL = isTrebleClef
     ? scaleLevel(Level.E_Major, isTrebleClef, reverse)
     : scaleLevel(Level.C_Major, isTrebleClef, reverse);
   switch (chord) {
     case Chord.C_Major:
-      return CLEVEL;
+      return C_LEVEL;
+    case Chord.G_Major:
+      return isTrebleClef ? scaleLevel(Level.D_Major, isTrebleClef, reverse) : scaleLevel(Level.G_Major, isTrebleClef, reverse);
+    case Chord.D_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.F_Sharp_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.D_Major, isTrebleClef, reverse);
+    case Chord.A_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.C_Sharp_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.A_Major, isTrebleClef, reverse);
+    case Chord.E_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.A_Flat_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.E_Major, isTrebleClef, reverse);
+    case Chord.B_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.E_Flat_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.B_Major, isTrebleClef, reverse);
+    case Chord.F_Sharp_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.B_Flat_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.F_Sharp_Major, isTrebleClef, reverse);
+    case Chord.G_Flat_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.B_Flat_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.G_Flat_Major, isTrebleClef, reverse);
+    case Chord.D_Flat_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.F_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.D_Flat_Major, isTrebleClef, reverse);
+    case Chord.C_Sharp_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.F_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.C_Sharp_Major, isTrebleClef, reverse);
+    case Chord.A_Flat_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.C_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.A_Flat_Major, isTrebleClef, reverse);
+    case Chord.E_Flat_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.G_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.E_Flat_Major, isTrebleClef, reverse);
+    case Chord.B_Flat_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.D_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.B_Flat_Major, isTrebleClef, reverse);
+    case Chord.F_Major:
+      return isTrebleClef ? scaleLevel(Level.A_Major, isTrebleClef, reverse) : scaleLevel(Level.F_Major, isTrebleClef, reverse);
     default:
-      return CLEVEL;
+      return C_LEVEL;
   }
 };
 
@@ -132,9 +180,9 @@ const scaleLevel = (level: Level, isTrebleClef: boolean, reverse: boolean = fals
       return buildNoteString(8, "a", octave, false, "b", [1, 2, 4, 5, 8], reverse);
     case Level.E_Flat_Major:
       return buildNoteString(8, "e", octave, false, "b", [1, 4, 5, 8], reverse);
-    case Level.B_Flat_Major:
+    case Level.B_Flat_Major: //D
       return buildNoteString(8, "b", octave, false, "b", [1, 4, 8], reverse);
-    case Level.F_Major:
+    case Level.F_Major: //A
       return buildNoteString(8, "f", octave, false, "b", [4], reverse);
     default:
       return buildNoteString(8, "c", octave, false, undefined, undefined, reverse);
