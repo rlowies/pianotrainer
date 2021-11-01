@@ -54,7 +54,7 @@ export const generateNotes = (
   return res;
 };
 
-const getNoteValue = (noteName: string): string => {
+export const getNoteValue = (noteName: string): string => {
   let resNote;
   const noteOctave = noteName.charAt(2);
   const noteWithoutOctave = noteName.substr(0, 2);

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import WebMidi, { InputEventNoteon } from "webmidi";
-import { /*randomSort,*/ INote } from "./../../services/NoteService/Note.service";
+import { /*randomSort,*/ getNoteValue, INote } from "./../../services/NoteService/Note.service";
 import {
   updateNotes,
   updateVoice,
@@ -109,7 +109,6 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
       const isCorrect = updateNotes(currentStaff, note);
 
       if (isCorrect) {
-        currentStaff.currentStaffNoteIndex += 1;
         //Reset note validation
         if (staffConfig.every((measure) => measure.currentStaffNoteIndex === notesPerMeasure)) {
           const newConfig = resetNoteValidation(
@@ -154,7 +153,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
           !hideButtons &&
             staffConfig.map((staff: StaffConfig) =>
               staff.playableNotes.map((x: INote, i: number) => (
-                <button key={i} onClick={() => setNote(x.name)}>
+                <button key={i} onClick={() => setNote(getNoteValue(x.name.toLocaleLowerCase()).toUpperCase())}>
                   Send {x.name}
                 </button>
               ))

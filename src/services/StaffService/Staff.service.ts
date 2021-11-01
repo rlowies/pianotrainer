@@ -53,6 +53,7 @@ export const updateNotes = (staff: StaffConfig, note: string): boolean => {
   if (currentNoteIndex < numNotes && currentNoteIndex === currentNoteToPlay.order % numNotes) {
     if (note === currentNoteToPlay.value) {
       notes[currentNoteIndex].setStyle(green);
+      staff.currentStaffNoteIndex += 1;
       return true;
     } else {
       notes[currentNoteIndex].setStyle(red);
