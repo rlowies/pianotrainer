@@ -63,7 +63,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
       staff.setContext(context).draw();
     });
     
-    updateVoice(staffConfig, level, initialClef);
+    updateVoice(staffConfig, level, initialClef, false);
     //eslint-disable-next-line
   }, []);
 
@@ -130,7 +130,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
           setStaffConfig(newConfig);
         }
       }
-      updateVoice(staffConfig, level, initialClef);
+      updateVoice(staffConfig, level, initialClef, true);
       setNote(""); //Clear note for next note
     }
   }, [

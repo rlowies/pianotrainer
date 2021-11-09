@@ -19,12 +19,13 @@ const red = { fillStyle: "#cc0000", strokeStyle: "#cc0000" };
 const green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
 const black = { fillStyle: "#000000", strokeStyle: "#000000" };
 
-export const updateVoice = (config: StaffConfig[], level: Level, clef: Clef) => {
+export const updateVoice = (config: StaffConfig[], level: Level, clef: Clef, refreshContext: boolean) => {
   const context = config[0].staff.getContext();
-  const refreshContext = clef === Clef.Grand;
-  if(refreshContext) {
+  if (refreshContext) {
     context.clear();
-    renderGrandStaff(context, config);
+    if (clef === Clef.Grand) {
+      renderGrandStaff(context, config);
+    }
   }
 
   config.forEach((staff) => {
@@ -108,7 +109,7 @@ export const resetStaff = (
     staffType.staff.setContext(context).draw();
   });
 
-  updateVoice(config, level, clef);
+  updateVoice(config, level, clef, false);
   return config;
 };
 
@@ -251,19 +252,18 @@ export const resetNoteValidation = (
   numMeasures: number,
   chord: Chord
 ): StaffConfig[] => {
-    const newConfig = resetStaff(
-      initialClef === Clef.Grand ? initialClef : clefType,
-      staffConfig,
-      width,
-      notesPerMeasure,
-      level,
-      timeSignature,
-      numMeasures,
-      chord,
-      SCALE_LEVELS.includes(level) ? [] : [...staffConfig.map((staff) => staff.playableNotes)]
-    );
-    const allNotes = staffConfig.map((measure) => measure.playableNotes.map((x) => x.note));
-    allNotes.forEach((staff) => staff.forEach((note) => note.setStyle(black)));
-    return newConfig;
-
+  const newConfig = resetStaff(
+    initialClef === Clef.Grand ? initialClef : clefType,
+    staffConfig,
+    width,
+    notesPerMeasure,
+    level,
+    timeSignature,
+    numMeasures,
+    chord,
+    SCALE_LEVELS.includes(level) ? [] : [...staffConfig.map((staff) => staff.playableNotes)]
+  );
+  const allNotes = staffConfig.map((measure) => measure.playableNotes.map((x) => x.note));
+  allNotes.forEach((staff) => staff.forEach((note) => note.setStyle(black)));
+  return newConfig;
 };
