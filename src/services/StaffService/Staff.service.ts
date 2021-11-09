@@ -19,8 +19,18 @@ const red = { fillStyle: "#cc0000", strokeStyle: "#cc0000" };
 const green = { fillStyle: "#00cc00", strokeStyle: "#00cc00" };
 const black = { fillStyle: "#000000", strokeStyle: "#000000" };
 
-export const updateVoice = (config: StaffConfig[], level: Level, clef: Clef) => {
+export const updateVoice = (config: StaffConfig[], level: Level, clef: Clef, refreshContext: boolean = false) => {
+  const context = config[0].staff.getContext();
+  
+  if(refreshContext) {
+    context.clear();
+    renderGrandStaff(context, config);
+  }
+
   config.forEach((staff) => {
+    if (refreshContext) {
+      staff.staff.setContext(context).draw();
+    }
     const notes = staff.playableNotes;
     const voice = new VF.Voice({ num_beats: notes.length, beat_value: 4 });
     voice.addTickables(notes.map((x) => x.note));
@@ -98,6 +108,7 @@ export const resetStaff = (
     staffType.staff.setContext(context).draw();
   });
 
+  updateVoice(config, level, clef, false);
   return config;
 };
 

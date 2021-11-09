@@ -62,7 +62,12 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
       }
       staff.setContext(context).draw();
     });
+    
+    updateVoice(staffConfig, level, initialClef, false);
+    //eslint-disable-next-line
+  }, []);
 
+  useEffect(() => {
     if (canEnableMidi) {
       WebMidi.enable(function (err) {
         if (err) {
@@ -86,7 +91,6 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
         WebMidi.disable();
       };
     }
-    // eslint-disable-next-line
   }, []);
 
   //Updates the staff when a note is sent
@@ -126,9 +130,9 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
           setStaffConfig(newConfig);
         }
       }
+      updateVoice(staffConfig, level, initialClef, true);
       setNote(""); //Clear note for next note
     }
-    updateVoice(staffConfig, level, initialClef);
   }, [
     note,
     staffConfig,

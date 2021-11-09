@@ -218,7 +218,13 @@ describe("When resetting staff", () => {
       getContext: jest.fn(() => renderer.getContext()),
       addClef: jest.fn(() => mockStave),
       addTimeSignature: jest.fn(),
-      setContext: jest.fn(() => mockStave)
+      setContext: jest.fn(() => mockStave),
+      getYForNote: jest.fn(() => mockStave.getYForNote()),
+      getYForLine: jest.fn(() => mockStave.getYForLine(0)),
+      getNumLines: jest.fn(() => mockStave.getNumLines()),
+      getNoteStartX: jest.fn(() => mockStave.getNoteStartX()),
+      getSpacingBetweenLines: jest.fn(() => mockStave.getSpacingBetweenLines()),
+      getStyle: jest.fn(() => {}),
     };
   });
 
@@ -240,7 +246,7 @@ describe("When resetting staff", () => {
       },
     ];
   });
-  
+
   it("Should correctly reset note validation for single measure", () => {
     updateNotes(staffConfig[0], "C4")
 
