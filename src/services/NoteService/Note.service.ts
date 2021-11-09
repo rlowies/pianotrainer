@@ -61,15 +61,15 @@ export const getNoteValue = (noteName: string): string => {
 
   if (noteName.codePointAt(1) === 98) {
     //for non major scales
-    // if (noteWithoutOctave === "fb") {
-    //   resNote = `E${noteOctave}`;
-    //   return resNote;
-    // }
+    if (noteWithoutOctave === "fb") {
+      resNote = `E${noteOctave}`;
+      return resNote;
+    }
 
-    // if (noteWithoutOctave === "cb") {
-    //   resNote = `B${noteOctave}`;
-    //   return resNote;
-    // }
+    if (noteWithoutOctave === "cb") {
+      resNote = `B${noteOctave}`;
+      return resNote;
+    }
 
     const asciiNote = noteName.charCodeAt(0);
     if (asciiNote === ASCII_a) {
