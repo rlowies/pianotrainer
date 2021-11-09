@@ -1,6 +1,6 @@
 import Vex from "vexflow";
 import { SCALE_LEVELS } from "../../types/constants";
-import { Level } from "../../types/levelType";
+import { Chord, Level } from "../../types/levelType";
 import { Clef } from "../StaffService/Staff.service";
 
 const ASCII_a = 97;
@@ -13,10 +13,17 @@ export interface INote {
   order: number;
 }
 
-export const generateNotes = (random: boolean = false, count: number, clef: Clef, level: Level, reverse: boolean = false): INote[] => {
+export const generateNotes = (
+  random: boolean = false,
+  count: number,
+  clef: Clef,
+  level: Level,
+  chord?: Chord,
+  reverse: boolean = false
+): INote[] => {
   const res: INote[] = [];
   const VF = Vex.Flow;
-  let allNotes = setupLevel(clef, level, reverse).split(",");
+  let allNotes = setupLevel(clef, level, chord!, reverse).split(",");
 
   if (random) {
     allNotes = allNotes.sort(randomSort);
@@ -47,21 +54,44 @@ export const generateNotes = (random: boolean = false, count: number, clef: Clef
   return res;
 };
 
-const getNoteValue = (noteName: string): string => {
-    let resNote;
-    if (noteName.codePointAt(1) === 98) {
-        const noteOctave = noteName.charAt(2);
-        const asciiNote = noteName.charCodeAt(0);
-        if (asciiNote === ASCII_a) {
-            resNote = `G#${noteOctave}`;
-        } else {
-            resNote = `${String.fromCharCode(asciiNote - 1)}#${noteOctave}`
-        }
-        return resNote;
+export const getNoteValue = (noteName: string): string => {
+  let resNote;
+  const noteOctave = noteName.charAt(2);
+  const noteWithoutOctave = noteName.substr(0, 2);
+
+  if (noteName.codePointAt(1) === 98) {
+    //for non major scales
+    if (noteWithoutOctave === "fb") {
+      resNote = `E${noteOctave}`;
+      return resNote;
     }
 
-    return noteName;
-}
+    if (noteWithoutOctave === "cb") {
+      resNote = `B${+noteOctave - 1}`;
+      return resNote;
+    }
+
+    const asciiNote = noteName.charCodeAt(0);
+    if (asciiNote === ASCII_a) {
+      resNote = `G#${noteOctave}`;
+    } else {
+      resNote = `${String.fromCharCode(asciiNote - 1)}#${noteOctave}`;
+    }
+    return resNote;
+  } else if (noteName.codePointAt(1) === 35) {
+    //#
+    if (noteWithoutOctave === "e#") {
+      resNote = `F${noteOctave}`;
+      return resNote;
+    }
+
+    if (noteWithoutOctave === "b#") {
+      resNote = `C${+noteOctave + 1}`;
+      return resNote;
+    }
+  }
+  return noteName;
+};
 
 export const randomSort = () => 0.5 - Math.random();
 
@@ -69,10 +99,10 @@ const clefIsTreble = (clef: Clef) => {
   return clef === Clef.Treble;
 };
 
-const setupLevel = (clef: Clef, level: Level, reverse: boolean = false): string => {
+const setupLevel = (clef: Clef, level: Level, chord: Chord, reverse: boolean = false): string => {
   const isTrebleClef = clefIsTreble(clef);
 
-  if (level === Level.Grand) return isTrebleClef ? buildNoteString(8, "c", 4, false) : buildNoteString(8, "c", 2, false);
+  if (level === Level.Chord) return grandLevel(isTrebleClef, chord, reverse);
   if (level === Level.Warmup) return isTrebleClef ? warmUpTreble : warmUpBass;
 
   if (SCALE_LEVELS.includes(level)) return scaleLevel(level, isTrebleClef, reverse);
@@ -83,6 +113,66 @@ const setupLevel = (clef: Clef, level: Level, reverse: boolean = false): string 
     return isTrebleClef ? trebleClefMedium : bassClefMedium;
   } else {
     return isTrebleClef ? trebleClefHard : bassClefHard;
+  }
+};
+
+const grandLevel = (isTrebleClef: boolean, chord: Chord, reverse: boolean) => {
+  const C_LEVEL = isTrebleClef
+    ? scaleLevel(Level.E_Major, isTrebleClef, reverse)
+    : scaleLevel(Level.C_Major, isTrebleClef, reverse);
+  switch (chord) {
+    case Chord.C_Major:
+      return C_LEVEL;
+    case Chord.G_Major:
+      return isTrebleClef ? scaleLevel(Level.D_Major, isTrebleClef, reverse) : scaleLevel(Level.G_Major, isTrebleClef, reverse);
+    case Chord.D_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.F_Sharp_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.D_Major, isTrebleClef, reverse);
+    case Chord.A_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.C_Sharp_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.A_Major, isTrebleClef, reverse);
+    case Chord.E_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.A_Flat_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.E_Major, isTrebleClef, reverse);
+    case Chord.B_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.E_Flat_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.B_Major, isTrebleClef, reverse);
+    case Chord.F_Sharp_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.B_Flat_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.F_Sharp_Major, isTrebleClef, reverse);
+    case Chord.G_Flat_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.B_Flat_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.G_Flat_Major, isTrebleClef, reverse);
+    case Chord.D_Flat_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.F_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.D_Flat_Major, isTrebleClef, reverse);
+    case Chord.C_Sharp_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.F_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.C_Sharp_Major, isTrebleClef, reverse);
+    case Chord.A_Flat_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.C_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.A_Flat_Major, isTrebleClef, reverse);
+    case Chord.E_Flat_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.G_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.E_Flat_Major, isTrebleClef, reverse);
+    case Chord.B_Flat_Major:
+      return isTrebleClef
+        ? scaleLevel(Level.D_Major, isTrebleClef, reverse)
+        : scaleLevel(Level.B_Flat_Major, isTrebleClef, reverse);
+    case Chord.F_Major:
+      return isTrebleClef ? scaleLevel(Level.A_Major, isTrebleClef, reverse) : scaleLevel(Level.F_Major, isTrebleClef, reverse);
+    default:
+      return C_LEVEL;
   }
 };
 
@@ -113,9 +203,9 @@ const scaleLevel = (level: Level, isTrebleClef: boolean, reverse: boolean = fals
       return buildNoteString(8, "a", octave, false, "b", [1, 2, 4, 5, 8], reverse);
     case Level.E_Flat_Major:
       return buildNoteString(8, "e", octave, false, "b", [1, 4, 5, 8], reverse);
-    case Level.B_Flat_Major:
+    case Level.B_Flat_Major: //D
       return buildNoteString(8, "b", octave, false, "b", [1, 4, 8], reverse);
-    case Level.F_Major:
+    case Level.F_Major: //A
       return buildNoteString(8, "f", octave, false, "b", [4], reverse);
     default:
       return buildNoteString(8, "c", octave, false, undefined, undefined, reverse);
@@ -129,7 +219,7 @@ export const buildNoteString = (
   skip: boolean = false,
   accidental: "#" | "b" | undefined = undefined,
   accidentalLocations: number[] | "all" = "all",
-  reverse: boolean = false,
+  reverse: boolean = false
 ): string => {
   let result = "";
   const startNote = initialNote.charCodeAt(0);

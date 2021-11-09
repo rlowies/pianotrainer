@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import WebMidi, { InputEventNoteon } from "webmidi";
-import { /*randomSort,*/ INote } from "./../../services/NoteService/Note.service";
+import { /*randomSort,*/ getNoteValue, INote } from "./../../services/NoteService/Note.service";
 import {
   updateNotes,
   updateVoice,
@@ -11,13 +11,13 @@ import {
   buildGrandStaff,
   renderGrandStaff,
   determineStaffIndex,
-  black,
+  resetNoteValidation,
 } from "./../../services/StaffService/Staff.service";
 import { useParams } from "react-router-dom";
 import "./Staff.css";
 import { usePrevious } from "../../hooks/usePreviousHook";
 import { LevelType } from "./../../types/levelType";
-import { RESET_NOTE, SCALE_LEVELS } from "./../../types/constants";
+import { RESET_NOTE } from "./../../types/constants";
 import { StaffConfig } from "../../types/staffConfig";
 
 const canEnableMidi = navigator.userAgent.indexOf("Chrome") !== -1;
@@ -35,18 +35,17 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
   const [note, setNote] = useState<string>("");
   const [hideButtons, setHideButtons] = useState<boolean>(false);
   const [clefType, setClefType] = useState<Clef>(initialClef === Clef.Grand ? Clef.Treble : initialClef);
-  let { level } = useParams<LevelType>();
+  let { level, chord } = useParams<LevelType>();
   const notesPerMeasure = initialClef === Clef.Grand ? numNotes : numNotes / numMeasures;
   const [staffConfig, setStaffConfig] = useState<StaffConfig[]>(
     initialClef === Clef.Grand
-      ? buildGrandStaff(width, level, numNotes)
+      ? buildGrandStaff(width, level, numNotes, chord)
       : buildBassOrTrebleStaff(width, level, notesPerMeasure, clefType, numMeasures)
   );
   const staffRef = useRef(null);
   const timeSignature = `${notesPerMeasure}/4`;
   const previousNote = usePrevious(note);
-
-  const currentStaffIndex = determineStaffIndex(level, +note.substr(1, 1), staffConfig);
+  const currentStaffIndex = determineStaffIndex(level, note, staffConfig, initialClef);
 
   //This is just initializing
   useEffect(() => {
@@ -57,13 +56,18 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
       if (i === 0) {
         staff.addClef(clefType).addTimeSignature(timeSignature);
       }
-      if (i === 1 && initialClef === Clef.Grand) {
+      if (i === 2 && initialClef === Clef.Grand) {
         staff.addClef(Clef.Bass).addTimeSignature(timeSignature);
         renderGrandStaff(context, staffConfig);
       }
       staff.setContext(context).draw();
     });
+    
+    updateVoice(staffConfig, level, initialClef, false);
+    //eslint-disable-next-line
+  }, []);
 
+  useEffect(() => {
     if (canEnableMidi) {
       WebMidi.enable(function (err) {
         if (err) {
@@ -87,7 +91,6 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
         WebMidi.disable();
       };
     }
-    // eslint-disable-next-line
   }, []);
 
   //Updates the staff when a note is sent
@@ -100,50 +103,36 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
         notesPerMeasure,
         level,
         timeSignature,
-        numMeasures
+        numMeasures,
+        chord
       );
       setStaffConfig(newConfig);
-      updateVoice(newConfig);
-      setNote("");
-      return;
     }
-    if (note !== "" && note !== previousNote) {
+    if (note !== "" && note !== previousNote && note !== RESET_NOTE) {
       const currentStaff = staffConfig[currentStaffIndex];
       const isCorrect = updateNotes(currentStaff, note);
 
       if (isCorrect) {
-        currentStaff.currentStaffNoteIndex += 1;
-        const firstMeasure = staffConfig[0];
-        const secondMeasure = staffConfig?.[1];
-        const firstMeasureComplete = firstMeasure.currentStaffNoteIndex === notesPerMeasure;
         //Reset note validation
-        if (
-          (numMeasures === 1 && firstMeasureComplete) ||
-          (firstMeasureComplete && secondMeasure.currentStaffNoteIndex === notesPerMeasure)
-        ) {
-          const newConfig = resetStaff(
-            initialClef === Clef.Grand ? initialClef : clefType,
+        if (staffConfig.every((measure) => measure.currentStaffNoteIndex === notesPerMeasure)) {
+          const newConfig = resetNoteValidation(
             staffConfig,
-            width,
             notesPerMeasure,
+            initialClef,
+            clefType,
+            width,
             level,
             timeSignature,
             numMeasures,
-            SCALE_LEVELS.includes(level)
-              ? [firstMeasure.playableNotes.concat(secondMeasure?.playableNotes)]
-              : [firstMeasure.playableNotes, secondMeasure?.playableNotes]
+            chord
           );
-          const notes = [
-            ...firstMeasure.playableNotes.map((x) => x.note),
-            ...(secondMeasure?.playableNotes?.map((x) => x.note) ?? []),
-          ];
-          notes.forEach((note) => note.setStyle(black));
+
           setStaffConfig(newConfig);
         }
       }
+      updateVoice(staffConfig, level, initialClef, true);
       setNote(""); //Clear note for next note
     }
-    updateVoice(staffConfig);
   }, [
     note,
     staffConfig,
@@ -157,6 +146,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
     notesPerMeasure,
     initialClef,
     currentStaffIndex,
+    chord,
   ]);
 
   return (
@@ -167,7 +157,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
           !hideButtons &&
             staffConfig.map((staff: StaffConfig) =>
               staff.playableNotes.map((x: INote, i: number) => (
-                <button key={i} onClick={() => setNote(x.name)}>
+                <button key={i} onClick={() => setNote(getNoteValue(x.name.toLocaleLowerCase()).toUpperCase())}>
                   Send {x.name}
                 </button>
               ))
@@ -182,14 +172,14 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
         >
           Reset
         </button>
-        <button
+        {initialClef !== Clef.Grand && <button
           onClick={() => {
             clefType === Clef.Bass ? setClefType(Clef.Treble) : setClefType(Clef.Bass);
             setNote(RESET_NOTE);
           }}
         >
           Change Clef
-        </button>
+        </button>}
         <button
           onClick={() => {
             setHideButtons(!hideButtons);
