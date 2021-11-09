@@ -63,7 +63,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
       staff.setContext(context).draw();
     });
     
-    updateVoice(staffConfig, level, initialClef, false);
+    updateVoice(staffConfig, level, initialClef);
     //eslint-disable-next-line
   }, []);
 
@@ -130,7 +130,7 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
           setStaffConfig(newConfig);
         }
       }
-      updateVoice(staffConfig, level, initialClef, true);
+      updateVoice(staffConfig, level, initialClef);
       setNote(""); //Clear note for next note
     }
   }, [
@@ -172,14 +172,14 @@ export const Staff = ({ width, numNotes, initialClef, numMeasures, rendererWidth
         >
           Reset
         </button>
-        <button
+        {initialClef !== Clef.Grand && <button
           onClick={() => {
             clefType === Clef.Bass ? setClefType(Clef.Treble) : setClefType(Clef.Bass);
             setNote(RESET_NOTE);
           }}
         >
           Change Clef
-        </button>
+        </button>}
         <button
           onClick={() => {
             setHideButtons(!hideButtons);
