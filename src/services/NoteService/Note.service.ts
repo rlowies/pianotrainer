@@ -67,7 +67,7 @@ export const getNoteValue = (noteName: string): string => {
     }
 
     if (noteWithoutOctave === "cb") {
-      resNote = `B${noteOctave}`;
+      resNote = `B${+noteOctave - 1}`;
       return resNote;
     }
 
